@@ -4,8 +4,9 @@ import { Shield, Terminal, Download, Github, Linkedin, Instagram, ExternalLink }
 
 const Home = () => {
   return (
-    // UPDATED: Increased top padding to pt-32 for mobile to clear the Navbar
-    <div className="min-h-screen flex items-start md:items-center justify-center p-4 pt-32 md:pt-20 relative z-10">
+    // CRITICAL FIX: 'pt-36' pushes content down so it is not hidden by the header
+    // 'items-start' stops it from floating to the middle and getting covered
+    <div className="min-h-screen flex items-start md:items-center justify-center p-4 pt-36 md:pt-20 relative z-10">
       
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start md:items-stretch">
         
@@ -20,7 +21,7 @@ const Home = () => {
                 <p>&gt; STATUS: <span className="text-green-500 animate-pulse">ONLINE</span></p>
              </div>
              
-             {/* Main Name - REDUCED SIZE FOR MOBILE (text-4xl) */}
+             {/* Main Name - Scaled for mobile */}
              <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-mono text-white mb-3 md:mb-4 tracking-tighter leading-none">
                 TUSHAR <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-900">
@@ -28,13 +29,13 @@ const Home = () => {
                 </span>
              </h1>
 
-             {/* Role */}
+             {/* Role - Fixed font size */}
              <h2 className="text-xs sm:text-sm md:text-xl text-slate-300 font-mono mb-6 md:mb-8 tracking-[0.1em] md:tracking-[0.2em] uppercase flex items-center gap-2">
                 <Shield className="w-4 h-4 md:w-5 md:h-5 text-red-500 flex-shrink-0" />
                 Offensive Security Engineer
              </h2>
 
-             {/* Description - Smaller text on mobile */}
+             {/* Description */}
              <p className="text-slate-400 mb-6 font-mono text-[11px] sm:text-xs md:text-sm leading-5 md:leading-7 max-w-xl border-l-2 border-red-500/30 pl-4">
                 Specializing in <span className="text-white font-bold">Network Intrusion</span>, 
                 <span className="text-white font-bold"> Web App Security</span>, and 
@@ -42,7 +43,7 @@ const Home = () => {
                 I don't just find bugs; I demonstrate the risk.
              </p>
 
-             {/* Action Buttons - Stacked & Full Width on Mobile */}
+             {/* Action Buttons */}
              <div className="flex flex-col sm:flex-row gap-3">
                 <button className="w-full sm:w-auto bg-red-600 text-black font-bold py-3 px-6 text-sm uppercase tracking-widest hover:bg-white transition-all clip-path-polygon flex items-center justify-center gap-2 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(220,38,38,0.4)] cursor-pointer">
                     <Terminal size={16} /> Initiate
@@ -60,9 +61,9 @@ const Home = () => {
         </div>
 
         {/* --- RIGHT COLUMN: PHOTO & SOCIALS --- */}
-        <div className="lg:col-span-5 flex flex-col gap-5 order-2">
+        <div className="lg:col-span-5 flex flex-col gap-5 order-2 pb-10">
            
-           {/* Profile Photo - Limited Height on Mobile */}
+           {/* Profile Photo */}
            <div className="relative group h-64 md:h-full md:max-h-[400px]">
               <div className="absolute -inset-1 bg-gradient-to-b from-red-600 to-transparent opacity-30 blur-sm rounded-lg"></div>
               

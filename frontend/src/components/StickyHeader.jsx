@@ -1,46 +1,99 @@
-import { useEffect, useState } from "react";
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, Shield } from 'lucide-react';
 
 const StickyHeader = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
-  useEffect(() => {
-    const handler = () => {
-      setIsScrolled(window.scrollY > 80);
-    };
-    handler();
-    window.addEventListener("scroll", handler);
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
+  const navLinks = [
+    { name: 'HOME', path: '/' },
+    { name: 'PROJECTS', path: '/projects' },
+    { name: 'BLOG', path: '/blog' },
+    { name: 'CONTACT', path: '/contact' },
+  ];
 
   return (
-    <div
-      className={`fixed inset-x-0 top-0 z-40 border-b border-slate-800/70 bg-slate-950/80 backdrop-blur-md transition-transform duration-200 ${
-        isScrolled ? "translate-y-0" : "-translate-y-full"
-      }`}
-    >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 text-xs text-slate-200">
-        <span className="font-semibold tracking-[0.2em] uppercase text-cyan-300">
-          Tushar Saini
-        </span>
-        <nav className="flex items-center gap-5">
-          <a href="#home" className="hover:text-cyan-300">
-            Home
-          </a>
-          <a href="#projects" className="hover:text-cyan-300">
-            Projects
-          </a>
-          <a href="#contact" className="hover:text-cyan-300">
-            Contact
-          </a>
-          <a
-            href="/admin"
-            className="rounded-full border border-cyan-400/50 px-3 py-1 text-[10px] font-medium hover:bg-cyan-400 hover:text-slate-950 transition-all"
-          >
-            Admin
-          </a>
-        </nav>
+    <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-red-900/30">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          
+          {/* LOGO SECTION - NAME REPLACEMENT */}
+          <div className="flex items-center gap-3">
+            <Shield className="w-8 h-8 text-blue-500" />
+            <div className="flex flex-col">
+              {/* UPDATED FULL NAME */}
+              <span className="text-white font-bold font-mono text-lg tracking-wider">
+                Tushar Kumar Saini
+              </span>
+              <span className="text-[10px] text-red-500 font-mono tracking-[0.2em] uppercase">
+                Red Team Operator
+              </span>
+            </div>
+          </div>
+
+          {/* DESKTOP MENU */}
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-8">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`text-sm font-mono font-bold transition-colors duration-300 ${
+                    location.pathname === link.path 
+                      ? 'text-red-500' 
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+              <Link 
+                to="/admin"
+                className="px-4 py-2 border border-red-900/50 rounded text-xs font-mono text-red-500 hover:bg-red-900/20 transition-all"
+              >
+                LOGIN
+              </Link>
+            </div>
+          </div>
+
+          {/* MOBILE MENU BUTTON */}
+          <div className="-mr-2 flex md:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-red-900/20 focus:outline-none"
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* MOBILE MENU DROPDOWN */}
+      {isOpen && (
+        <div className="md:hidden bg-black/95 border-b border-red-900/50">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                onClick={() => setIsOpen(false)}
+                className="block px-3 py-2 text-base font-mono font-medium text-slate-300 hover:text-white hover:bg-red-900/20"
+              >
+                {link.name}
+              </Link>
+            ))}
+            <Link 
+              to="/admin"
+              onClick={() => setIsOpen(false)}
+              className="block px-3 py-2 text-base font-mono font-medium text-red-500 hover:bg-red-900/20"
+            >
+              LOGIN
+            </Link>
+          </div>
+        </div>
+      )}
+    </nav>
   );
 };
 
