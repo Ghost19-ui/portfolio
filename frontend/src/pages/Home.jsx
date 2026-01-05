@@ -1,71 +1,122 @@
 import React from 'react';
 import HoloCard from '../components/HoloCard';
-import { Shield, Lock, Bug, Terminal } from 'lucide-react'; // Using Lucide icons to match your theme
+import { Shield, Terminal, Download, Github, Linkedin, Instagram, ExternalLink } from 'lucide-react';
 
 const Home = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 pt-20">
-      <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <div className="min-h-screen flex items-center justify-center p-4 pt-20 relative z-10">
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         
-        {/* LEFT COLUMN: The Terminal / Bio */}
-        <div className="space-y-6">
-          <HoloCard title="ROOT_ACCESS_GRANTED">
-             <div className="font-mono text-sm text-red-400 mb-4 opacity-70">
-                &gt; Initializing Red Team Protocols...<br/>
-                &gt; Decrypting User Identity...<br/>
-                &gt; Target: Secure Infrastructure<br/>
+        {/* --- LEFT COLUMN: BIO & INTEL (Span 7) --- */}
+        <div className="lg:col-span-7 flex flex-col justify-center">
+          <HoloCard title="OPERATOR_PROFILE">
+             
+             {/* Terminal Header */}
+             <div className="font-mono text-xs text-red-500 mb-6 opacity-80 border-l-2 border-red-600 pl-3">
+                <p>&gt; IDENTITY VERIFIED: <span className="text-white">GHOST19-UI</span></p>
+                <p>&gt; CLEARANCE LEVEL: <span className="text-white">TOP SECRET</span></p>
+                <p>&gt; STATUS: <span className="text-green-500 animate-pulse">ONLINE</span></p>
              </div>
              
-             <h1 className="text-6xl font-bold font-mono text-white mb-2 tracking-tighter">
-                TUSHAR <span className="text-red-600">SAINI</span>
+             {/* Main Name */}
+             <h1 className="text-6xl md:text-7xl font-bold font-mono text-white mb-4 tracking-tighter leading-none">
+                TUSHAR <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-900">
+                  SAINI
+                </span>
              </h1>
-             <h2 className="text-2xl text-slate-300 font-mono mb-6 tracking-widest uppercase border-b border-red-900/50 pb-4">
+
+             {/* Role */}
+             <h2 className="text-xl text-slate-300 font-mono mb-8 tracking-[0.2em] uppercase flex items-center gap-3">
+                <Shield size={20} className="text-red-500" />
                 Offensive Security Engineer
              </h2>
 
-             <p className="text-slate-400 mb-8 font-mono text-sm leading-6 border-l-2 border-red-500 pl-4">
-                Specializing in <span className="text-white">Network Intrusion</span>, 
-                <span className="text-white">Web App Security</span>, and 
-                <span className="text-white">Exploit Development</span>. 
+             {/* Description */}
+             <p className="text-slate-400 mb-8 font-mono text-sm leading-7 max-w-xl border-l-2 border-red-500/30 pl-4">
+                Specializing in <span className="text-white font-bold">Network Intrusion</span>, 
+                <span className="text-white font-bold"> Web App Security</span>, and 
+                <span className="text-white font-bold"> Exploit Development</span>. 
                 I don't just find bugs; I demonstrate the risk.
              </p>
 
-             <div className="flex gap-4">
-                <button className="bg-red-600 text-black font-bold py-3 px-6 uppercase tracking-widest hover:bg-white transition-colors clip-path-polygon cursor-pointer flex items-center gap-2">
+             {/* Action Buttons */}
+             <div className="flex flex-wrap gap-4">
+                <button className="bg-red-600 text-black font-bold py-3 px-8 uppercase tracking-widest hover:bg-white transition-all clip-path-polygon flex items-center gap-2 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(220,38,38,0.4)] cursor-pointer">
                     <Terminal size={18} /> Initiate
                 </button>
                 
-                {/* --- FIXED DOWNLOAD BUTTON --- */}
-                {/* 1. Changed to <a> tag */}
-                {/* 2. Added href="/resume.pdf" */}
-                {/* 3. Added download attribute to force file save */}
+                {/* Resume Download */}
                 <a 
                   href="/resume.pdf" 
                   download="Tushar_Saini_Resume.pdf"
-                  className="border border-red-500 text-red-500 font-bold py-3 px-6 uppercase tracking-widest hover:bg-red-900/20 transition-colors cursor-pointer text-center flex items-center gap-2"
+                  className="border border-red-500 text-red-500 font-bold py-3 px-8 uppercase tracking-widest hover:bg-red-950/30 transition-all flex items-center gap-2 hover:shadow-[0_0_15px_rgba(220,38,38,0.2)] cursor-pointer text-center"
                 >
-                    Download Intel
+                    <Download size={18} /> Intel
                 </a>
              </div>
           </HoloCard>
         </div>
 
-        {/* RIGHT COLUMN: Floating Icons (Updated to use Lucide React) */}
-        <div className="hidden lg:flex flex-col gap-6 items-end pointer-events-none">
+        {/* --- RIGHT COLUMN: PHOTO & SOCIALS (Span 5) --- */}
+        <div className="lg:col-span-5 flex flex-col gap-6">
            
-           {/* ICON 1: LOCK */}
-           <div className="w-24 h-24 bg-red-900/10 backdrop-blur-sm border border-red-500/30 rounded-full flex items-center justify-center animate-float" style={{animationDelay: '0s'}}>
-              <Lock size={40} className="text-red-500 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]" />
+           {/* 1. PROFILE PHOTO CARD */}
+           <div className="relative group h-full max-h-[400px]">
+              {/* Decorative Borders */}
+              <div className="absolute -inset-1 bg-gradient-to-b from-red-600 to-transparent opacity-30 blur-sm rounded-lg"></div>
+              
+              <div className="relative bg-black/80 backdrop-blur-md border border-red-900/50 p-2 rounded-lg clip-path-polygon-corner h-full">
+                 <img 
+                    src="/profile.jpeg" 
+                    alt="Tushar Saini" 
+                    className="w-full h-full object-cover object-top rounded border border-white/10 grayscale group-hover:grayscale-0 transition-all duration-500"
+                 />
+                 
+                 {/* Overlay Text */}
+                 <div className="absolute bottom-4 left-4 bg-black/90 border-l-4 border-red-600 px-3 py-1">
+                    <p className="text-xs text-red-500 font-mono font-bold tracking-widest">TARGET_ID: GHOST</p>
+                 </div>
+              </div>
            </div>
 
-           {/* ICON 2: SHIELD */}
-           <div className="w-24 h-24 bg-red-900/10 backdrop-blur-sm border border-red-500/30 rounded-full flex items-center justify-center animate-float" style={{animationDelay: '1s', marginRight: '40px'}}>
-              <Shield size={40} className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]" />
-           </div>
+           {/* 2. SOCIAL LINKS GRID */}
+           <div className="grid grid-cols-1 gap-4">
+              <HoloCard title="CONNECT_UPLINK">
+                 <div className="space-y-3">
+                    
+                    {/* LinkedIn (UPDATED) */}
+                    <a href="https://www.linkedin.com/in/tushar-kumar-saini-4138a72b2/" target="_blank" rel="noreferrer" 
+                       className="flex items-center justify-between p-3 bg-white/5 border border-white/10 hover:border-blue-500 hover:bg-blue-500/10 transition-all group rounded cursor-pointer">
+                       <div className="flex items-center gap-3">
+                          <Linkedin size={20} className="text-slate-400 group-hover:text-blue-400" />
+                          <span className="text-sm font-mono text-slate-300 group-hover:text-white">LinkedIn</span>
+                       </div>
+                       <ExternalLink size={14} className="text-slate-600 group-hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-all" />
+                    </a>
 
-           {/* ICON 3: BUG */}
-           <div className="w-24 h-24 bg-red-900/10 backdrop-blur-sm border border-red-500/30 rounded-full flex items-center justify-center animate-float" style={{animationDelay: '2s'}}>
-              <Bug size={40} className="text-red-500 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]" />
+                    {/* Instagram (UPDATED) */}
+                    <a href="https://www.instagram.com/tushar_saini___19/" target="_blank" rel="noreferrer"
+                       className="flex items-center justify-between p-3 bg-white/5 border border-white/10 hover:border-pink-500 hover:bg-pink-500/10 transition-all group rounded cursor-pointer">
+                       <div className="flex items-center gap-3">
+                          <Instagram size={20} className="text-slate-400 group-hover:text-pink-400" />
+                          <span className="text-sm font-mono text-slate-300 group-hover:text-white">Instagram</span>
+                       </div>
+                       <ExternalLink size={14} className="text-slate-600 group-hover:text-pink-400 opacity-0 group-hover:opacity-100 transition-all" />
+                    </a>
+
+                    {/* GitHub (Kept Ghost19-ui) */}
+                    <a href="https://github.com/Ghost19-ui" target="_blank" rel="noreferrer"
+                       className="flex items-center justify-between p-3 bg-white/5 border border-white/10 hover:border-white hover:bg-white/10 transition-all group rounded cursor-pointer">
+                       <div className="flex items-center gap-3">
+                          <Github size={20} className="text-slate-400 group-hover:text-white" />
+                          <span className="text-sm font-mono text-slate-300 group-hover:text-white">GitHub</span>
+                       </div>
+                       <ExternalLink size={14} className="text-slate-600 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all" />
+                    </a>
+
+                 </div>
+              </HoloCard>
            </div>
 
         </div>
