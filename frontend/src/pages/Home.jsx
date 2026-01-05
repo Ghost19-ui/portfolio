@@ -67,16 +67,12 @@ const Home = () => {
               <div className="absolute -inset-1 bg-gradient-to-b from-red-600 to-transparent opacity-30 blur-sm rounded-lg"></div>
               
               <div className="relative bg-black/80 backdrop-blur-md border border-red-900/50 p-2 rounded-lg clip-path-polygon-corner h-full">
+                 {/* REMOVED 'grayscale' CLASS and 'Target ID' overlay */}
                  <img 
                     src="/profile.jpeg" 
                     alt="Tushar Saini" 
-                    className="w-full h-full object-cover object-top rounded border border-white/10 grayscale group-hover:grayscale-0 transition-all duration-500"
+                    className="w-full h-full object-cover object-top rounded border border-white/10 transition-all duration-500"
                  />
-                 
-                 {/* Overlay Text */}
-                 <div className="absolute bottom-4 left-4 bg-black/90 border-l-4 border-red-600 px-3 py-1">
-                    <p className="text-xs text-red-500 font-mono font-bold tracking-widest">TARGET_ID: GHOST</p>
-                 </div>
               </div>
            </div>
 
@@ -85,7 +81,7 @@ const Home = () => {
               <HoloCard title="CONNECT_UPLINK">
                  <div className="space-y-3">
                     
-                    {/* LinkedIn (UPDATED) */}
+                    {/* LinkedIn */}
                     <a href="https://www.linkedin.com/in/tushar-kumar-saini-4138a72b2/" target="_blank" rel="noreferrer" 
                        className="flex items-center justify-between p-3 bg-white/5 border border-white/10 hover:border-blue-500 hover:bg-blue-500/10 transition-all group rounded cursor-pointer">
                        <div className="flex items-center gap-3">
@@ -95,7 +91,7 @@ const Home = () => {
                        <ExternalLink size={14} className="text-slate-600 group-hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-all" />
                     </a>
 
-                    {/* Instagram (UPDATED) */}
+                    {/* Instagram */}
                     <a href="https://www.instagram.com/tushar_saini___19/" target="_blank" rel="noreferrer"
                        className="flex items-center justify-between p-3 bg-white/5 border border-white/10 hover:border-pink-500 hover:bg-pink-500/10 transition-all group rounded cursor-pointer">
                        <div className="flex items-center gap-3">
@@ -105,7 +101,7 @@ const Home = () => {
                        <ExternalLink size={14} className="text-slate-600 group-hover:text-pink-400 opacity-0 group-hover:opacity-100 transition-all" />
                     </a>
 
-                    {/* GitHub (Kept Ghost19-ui) */}
+                    {/* GitHub */}
                     <a href="https://github.com/Ghost19-ui" target="_blank" rel="noreferrer"
                        className="flex items-center justify-between p-3 bg-white/5 border border-white/10 hover:border-white hover:bg-white/10 transition-all group rounded cursor-pointer">
                        <div className="flex items-center gap-3">
