@@ -4,53 +4,55 @@ import { Shield, Terminal, Download, Github, Linkedin, Instagram, ExternalLink }
 
 const Home = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 pt-20 relative z-10">
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+    // CHANGED: 'items-center' -> 'items-start md:items-center' (Prevents vertical squashing on phones)
+    // CHANGED: 'pt-20' -> 'pt-24 md:pt-20' (More space for navbar on mobile)
+    <div className="min-h-screen flex items-start md:items-center justify-center p-4 pt-24 md:pt-20 relative z-10">
+      
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start md:items-stretch">
         
-        {/* --- LEFT COLUMN: BIO & INTEL (Span 7) --- */}
-        <div className="lg:col-span-7 flex flex-col justify-center">
+        {/* --- LEFT COLUMN: BIO --- */}
+        <div className="lg:col-span-7 flex flex-col justify-center order-1">
           <HoloCard title="OPERATOR_PROFILE">
              
-             {/* Terminal Header */}
-             <div className="font-mono text-xs text-red-500 mb-6 opacity-80 border-l-2 border-red-600 pl-3">
+             {/* Header Details - Smaller on mobile */}
+             <div className="font-mono text-[10px] md:text-xs text-red-500 mb-4 md:mb-6 opacity-80 border-l-2 border-red-600 pl-3">
                 <p>&gt; IDENTITY VERIFIED: <span className="text-white">GHOST19-UI</span></p>
                 <p>&gt; CLEARANCE LEVEL: <span className="text-white">TOP SECRET</span></p>
                 <p>&gt; STATUS: <span className="text-green-500 animate-pulse">ONLINE</span></p>
              </div>
              
-             {/* Main Name */}
-             <h1 className="text-6xl md:text-7xl font-bold font-mono text-white mb-4 tracking-tighter leading-none">
+             {/* Main Name - Scaled text size */}
+             <h1 className="text-5xl md:text-7xl font-bold font-mono text-white mb-4 tracking-tighter leading-none">
                 TUSHAR <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-900">
                   SAINI
                 </span>
              </h1>
 
-             {/* Role */}
-             <h2 className="text-xl text-slate-300 font-mono mb-8 tracking-[0.2em] uppercase flex items-center gap-3">
-                <Shield size={20} className="text-red-500" />
+             {/* Role - Fixed wrapping issues */}
+             <h2 className="text-sm md:text-xl text-slate-300 font-mono mb-6 md:mb-8 tracking-[0.2em] uppercase flex items-center gap-2 md:gap-3">
+                <Shield className="w-4 h-4 md:w-5 md:h-5 text-red-500 flex-shrink-0" />
                 Offensive Security Engineer
              </h2>
 
              {/* Description */}
-             <p className="text-slate-400 mb-8 font-mono text-sm leading-7 max-w-xl border-l-2 border-red-500/30 pl-4">
+             <p className="text-slate-400 mb-6 md:mb-8 font-mono text-xs md:text-sm leading-6 md:leading-7 max-w-xl border-l-2 border-red-500/30 pl-4">
                 Specializing in <span className="text-white font-bold">Network Intrusion</span>, 
                 <span className="text-white font-bold"> Web App Security</span>, and 
                 <span className="text-white font-bold"> Exploit Development</span>. 
                 I don't just find bugs; I demonstrate the risk.
              </p>
 
-             {/* Action Buttons */}
-             <div className="flex flex-wrap gap-4">
-                <button className="bg-red-600 text-black font-bold py-3 px-8 uppercase tracking-widest hover:bg-white transition-all clip-path-polygon flex items-center gap-2 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(220,38,38,0.4)] cursor-pointer">
+             {/* Action Buttons - Stack vertically on phones */}
+             <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+                <button className="w-full sm:w-auto bg-red-600 text-black font-bold py-3 px-8 uppercase tracking-widest hover:bg-white transition-all clip-path-polygon flex items-center justify-center gap-2 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(220,38,38,0.4)] cursor-pointer">
                     <Terminal size={18} /> Initiate
                 </button>
                 
-                {/* Resume Download */}
                 <a 
                   href="/resume.pdf" 
                   download="Tushar_Saini_Resume.pdf"
-                  className="border border-red-500 text-red-500 font-bold py-3 px-8 uppercase tracking-widest hover:bg-red-950/30 transition-all flex items-center gap-2 hover:shadow-[0_0_15px_rgba(220,38,38,0.2)] cursor-pointer text-center"
+                  className="w-full sm:w-auto border border-red-500 text-red-500 font-bold py-3 px-8 uppercase tracking-widest hover:bg-red-950/30 transition-all flex items-center justify-center gap-2 hover:shadow-[0_0_15px_rgba(220,38,38,0.2)] cursor-pointer text-center"
                 >
                     <Download size={18} /> Intel
                 </a>
@@ -58,16 +60,14 @@ const Home = () => {
           </HoloCard>
         </div>
 
-        {/* --- RIGHT COLUMN: PHOTO & SOCIALS (Span 5) --- */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
+        {/* --- RIGHT COLUMN: PHOTO & SOCIALS --- */}
+        <div className="lg:col-span-5 flex flex-col gap-6 order-2">
            
-           {/* 1. PROFILE PHOTO CARD */}
-           <div className="relative group h-full max-h-[400px]">
-              {/* Decorative Borders */}
+           {/* 1. PROFILE PHOTO - Height constrained on mobile */}
+           <div className="relative group h-64 md:h-full md:max-h-[400px]">
               <div className="absolute -inset-1 bg-gradient-to-b from-red-600 to-transparent opacity-30 blur-sm rounded-lg"></div>
               
               <div className="relative bg-black/80 backdrop-blur-md border border-red-900/50 p-2 rounded-lg clip-path-polygon-corner h-full">
-                 {/* REMOVED 'grayscale' CLASS and 'Target ID' overlay */}
                  <img 
                     src="/profile.jpeg" 
                     alt="Tushar Saini" 
