@@ -39,7 +39,7 @@ const Layout = ({ children }) => {
                 <span className={`font-bold text-white tracking-tight transition-all duration-300 font-mono ${
                   scrolled ? 'text-lg' : 'text-xl'
                 }`}>
-                  Tushar Saini
+                  Tushar Kumar Saini
                 </span>
                 <span className={`text-[10px] text-red-500 font-mono uppercase tracking-widest transition-all duration-300 ${
                    scrolled ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'
