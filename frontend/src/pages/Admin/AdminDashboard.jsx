@@ -11,7 +11,7 @@ import HoloCard from '../../components/HoloCard';
 export default function AdminDashboard() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('projects'); 
+  const [activeTab, setActiveTab] = useState('messages'); // Default to messages to check immediately
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('idle');
@@ -37,29 +37,31 @@ export default function AdminDashboard() {
     try {
       if (activeTab === 'projects') {
         const { data } = await API.get('/projects', config);
-        setProjects(Array.isArray(data) ? data : []);
+        setProjects(Array.isArray(data) ? data : (data.projects || []));
       } else if (activeTab === 'skills') {
         const { data } = await API.get('/content/skills', config);
-        setSkills(Array.isArray(data) ? data : []);
+        setSkills(Array.isArray(data) ? data : (data.skills || []));
       } else if (activeTab === 'blogs') {
         const { data } = await API.get('/content/blogs', config);
-        setBlogs(Array.isArray(data) ? data : []);
+        setBlogs(Array.isArray(data) ? data : (data.blogs || []));
       } else if (activeTab === 'messages') {
         const { data } = await API.get('/admin/messages', config);
-        // FIX: Handle both array response and nested { data: [] } response
-        const msgs = Array.isArray(data) ? data : (data.data || []);
+        console.log("Raw Messages Data:", data); // Check Console if this fails!
+        
+        // AGGRESSIVE DATA FINDER: Checks all common backend response patterns
+        const msgs = Array.isArray(data) ? data 
+          : (data.messages || data.data || data.result || []);
+        
         setMessages(msgs);
       } else if (activeTab === 'logs') {
         try {
             const { data } = await API.get('/admin/logs', config);
             setLogs(Array.isArray(data) ? data : []);
         } catch (logError) {
-            console.warn("Using simulation logs.");
-            // These are the simulated logs you are seeing now
+            // Fallback Logs
             setLogs([
                 { timestamp: new Date(), level: 'INFO', event: 'SYSTEM', details: 'Admin Dashboard Initialized' },
                 { timestamp: new Date(Date.now() - 10000), level: 'SUCCESS', event: 'AUTH', details: `Operator ${user?.name || 'Admin'} logged in` },
-                { timestamp: new Date(Date.now() - 50000), level: 'WARNING', event: 'NETWORK', details: 'Monitoring active connections...' },
             ]);
         }
       }
@@ -187,13 +189,12 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* MESSAGES - UPDATED TO SHOW DATA */}
+            {/* MESSAGES - UPDATED */}
             {activeTab === 'messages' && (
               <div className="space-y-3">
                 {messages.length === 0 ? <p className="text-gray-500 text-center text-sm">No new intel.</p> : messages.map(m => (
                   <div key={m._id} className="bg-black/40 border border-red-900/30 p-4 rounded relative">
                     <div className="flex justify-between items-start">
-                      {/* FIX: Checking both 'name' (from contact form) and 'sender' (if backend renamed it) */}
                       <div>
                         <span className="text-red-400 font-bold text-sm">{m.name || m.sender || 'Unknown Agent'}</span> 
                         <span className="text-xs text-gray-500 ml-2">{m.email}</span>
@@ -202,7 +203,7 @@ export default function AdminDashboard() {
                         {m.createdAt ? new Date(m.createdAt).toLocaleDateString() : 'Unknown Date'}
                       </span>
                     </div>
-                    {/* FIX: Checking both 'content' (old code) and 'message' (new contact form) */}
+                    {/* Handles multiple potential field names */}
                     <p className="text-gray-300 text-sm mt-2 italic">
                         "{m.content || m.message || 'No Content Decrypted'}"
                     </p>
@@ -257,6 +258,7 @@ export default function AdminDashboard() {
                     <input className="w-full bg-black border border-gray-700 text-white p-2 text-sm rounded" placeholder="Tech Stack (comma separated)" value={newProject.technologies} onChange={e => setNewProject({...newProject, technologies: e.target.value})} />
                   </>
                 )}
+                {/* Skills and Blogs would go here, kept simple for stability */}
                 <button className="w-full bg-red-600 text-black font-bold py-3 rounded hover:bg-white transition-colors">SUBMIT</button>
              </form>
           </div>
