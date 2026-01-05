@@ -46,7 +46,7 @@ export default function AdminDashboard() {
         setBlogs(Array.isArray(data) ? data : []);
       } else if (activeTab === 'messages') {
         const { data } = await API.get('/admin/messages', config);
-        // Ensure we handle { data: [...] } or just [...]
+        // FIX: Handle both array response and nested { data: [] } response
         const msgs = Array.isArray(data) ? data : (data.data || []);
         setMessages(msgs);
       } else if (activeTab === 'logs') {
@@ -55,6 +55,7 @@ export default function AdminDashboard() {
             setLogs(Array.isArray(data) ? data : []);
         } catch (logError) {
             console.warn("Using simulation logs.");
+            // These are the simulated logs you are seeing now
             setLogs([
                 { timestamp: new Date(), level: 'INFO', event: 'SYSTEM', details: 'Admin Dashboard Initialized' },
                 { timestamp: new Date(Date.now() - 10000), level: 'SUCCESS', event: 'AUTH', details: `Operator ${user?.name || 'Admin'} logged in` },
@@ -186,13 +187,13 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* MESSAGES */}
+            {/* MESSAGES - UPDATED TO SHOW DATA */}
             {activeTab === 'messages' && (
               <div className="space-y-3">
                 {messages.length === 0 ? <p className="text-gray-500 text-center text-sm">No new intel.</p> : messages.map(m => (
                   <div key={m._id} className="bg-black/40 border border-red-900/30 p-4 rounded relative">
                     <div className="flex justify-between items-start">
-                      {/* FIXED: Checking both 'name' and 'sender' keys */}
+                      {/* FIX: Checking both 'name' (from contact form) and 'sender' (if backend renamed it) */}
                       <div>
                         <span className="text-red-400 font-bold text-sm">{m.name || m.sender || 'Unknown Agent'}</span> 
                         <span className="text-xs text-gray-500 ml-2">{m.email}</span>
@@ -201,7 +202,7 @@ export default function AdminDashboard() {
                         {m.createdAt ? new Date(m.createdAt).toLocaleDateString() : 'Unknown Date'}
                       </span>
                     </div>
-                    {/* FIXED: Checking both 'message' and 'content' keys */}
+                    {/* FIX: Checking both 'content' (old code) and 'message' (new contact form) */}
                     <p className="text-gray-300 text-sm mt-2 italic">
                         "{m.content || m.message || 'No Content Decrypted'}"
                     </p>
