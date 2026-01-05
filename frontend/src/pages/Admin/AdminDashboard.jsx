@@ -46,7 +46,7 @@ export default function AdminDashboard() {
         setBlogs(Array.isArray(data) ? data : (data.blogs || []));
       } else if (activeTab === 'messages') {
         const { data } = await API.get('/admin/messages', config);
-        console.log("Raw Messages Data:", data); // Check Console if this fails!
+        console.log("Raw Messages Data:", data); // Check Console (F12) if this fails!
         
         // AGGRESSIVE DATA FINDER: Checks all common backend response patterns
         const msgs = Array.isArray(data) ? data 
@@ -258,7 +258,6 @@ export default function AdminDashboard() {
                     <input className="w-full bg-black border border-gray-700 text-white p-2 text-sm rounded" placeholder="Tech Stack (comma separated)" value={newProject.technologies} onChange={e => setNewProject({...newProject, technologies: e.target.value})} />
                   </>
                 )}
-                {/* Skills and Blogs would go here, kept simple for stability */}
                 <button className="w-full bg-red-600 text-black font-bold py-3 rounded hover:bg-white transition-colors">SUBMIT</button>
              </form>
           </div>
