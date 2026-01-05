@@ -220,6 +220,7 @@ export default function AdminDashboard() {
                 <h2 className="text-white font-bold uppercase">New Entry</h2>
                 <button onClick={() => setShowModal(false)}><X className="text-white" /></button>
              </div>
+             {/* Simple Dynamic Form based on activeTab */}
              <form onSubmit={handleCreate} className="space-y-4">
                 {activeTab === 'projects' && (
                   <>
