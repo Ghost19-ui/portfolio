@@ -16,14 +16,12 @@ export default function AdminDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('idle');
 
-  // Data States
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
   const [blogs, setBlogs] = useState([]);
   const [messages, setMessages] = useState([]); 
   const [logs, setLogs] = useState([]); 
 
-  // Form States
   const [newProject, setNewProject] = useState({ title: '', description: '', image: '', githubLink: '', technologies: '' });
   const [newSkill, setNewSkill] = useState({ category: 'Cybersecurity', name: '', level: 50 });
   const [newBlog, setNewBlog] = useState({ title: '', content: '', summary: '', tags: '' });
@@ -48,15 +46,15 @@ export default function AdminDashboard() {
         setBlogs(Array.isArray(data) ? data : []);
       } else if (activeTab === 'messages') {
         const { data } = await API.get('/admin/messages', config);
-        setMessages(Array.isArray(data) ? data : []);
+        // Ensure we handle { data: [...] } or just [...]
+        const msgs = Array.isArray(data) ? data : (data.data || []);
+        setMessages(msgs);
       } else if (activeTab === 'logs') {
-        // --- IMPROVED LOG FETCHING WITH FALLBACK ---
         try {
             const { data } = await API.get('/admin/logs', config);
             setLogs(Array.isArray(data) ? data : []);
         } catch (logError) {
-            console.warn("Logs endpoint unreachable, showing local system logs.");
-            // Fallback Logs if backend doesn't support it
+            console.warn("Using simulation logs.");
             setLogs([
                 { timestamp: new Date(), level: 'INFO', event: 'SYSTEM', details: 'Admin Dashboard Initialized' },
                 { timestamp: new Date(Date.now() - 10000), level: 'SUCCESS', event: 'AUTH', details: `Operator ${user?.name || 'Admin'} logged in` },
@@ -65,7 +63,7 @@ export default function AdminDashboard() {
         }
       }
     } catch (e) { 
-        console.error("General Fetch Error:", e); 
+        console.error("Fetch Error:", e);
     } finally { 
         setLoading(false); 
     }
@@ -124,8 +122,8 @@ export default function AdminDashboard() {
       if (type === 'message') endpoint = `/admin/messages/${id}`; 
       
       await API.delete(endpoint, config);
-      fetchData(); // Refresh data after delete
-    } catch (e) { console.error("Delete failed", e); }
+      fetchData();
+    } catch (e) { console.error(e); }
   };
 
   return (
@@ -194,10 +192,19 @@ export default function AdminDashboard() {
                 {messages.length === 0 ? <p className="text-gray-500 text-center text-sm">No new intel.</p> : messages.map(m => (
                   <div key={m._id} className="bg-black/40 border border-red-900/30 p-4 rounded relative">
                     <div className="flex justify-between items-start">
-                      <div><span className="text-red-400 font-bold text-sm">{m.name}</span> <span className="text-xs text-gray-500 ml-2">{m.email}</span></div>
-                      <span className="text-[10px] text-gray-600">{new Date(m.createdAt).toLocaleDateString()}</span>
+                      {/* FIXED: Checking both 'name' and 'sender' keys */}
+                      <div>
+                        <span className="text-red-400 font-bold text-sm">{m.name || m.sender || 'Unknown Agent'}</span> 
+                        <span className="text-xs text-gray-500 ml-2">{m.email}</span>
+                      </div>
+                      <span className="text-[10px] text-gray-600">
+                        {m.createdAt ? new Date(m.createdAt).toLocaleDateString() : 'Unknown Date'}
+                      </span>
                     </div>
-                    <p className="text-gray-300 text-sm mt-2 italic">"{m.content}"</p>
+                    {/* FIXED: Checking both 'message' and 'content' keys */}
+                    <p className="text-gray-300 text-sm mt-2 italic">
+                        "{m.content || m.message || 'No Content Decrypted'}"
+                    </p>
                     <button onClick={() => handleDelete(m._id, 'message')} className="absolute bottom-4 right-4 text-gray-600 hover:text-red-500"><Trash2 size={14}/></button>
                   </div>
                 ))}
@@ -220,11 +227,9 @@ export default function AdminDashboard() {
             
             {/* LOGS */}
             {activeTab === 'logs' && logs.map((log, i) => (
-                <div key={i} className="text-xs font-mono border-b border-gray-800 py-2 flex gap-3 items-center">
+                <div key={i} className="text-xs font-mono border-b border-gray-800 py-1 flex gap-2">
                     <span className="text-gray-500">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
-                    <span className={`font-bold ${log.level === 'ERROR' ? 'text-red-500' : log.level === 'WARNING' ? 'text-yellow-500' : 'text-green-500'}`}>
-                        {log.level}
-                    </span>
+                    <span className={log.level === 'ERROR' ? 'text-red-500' : 'text-green-500'}>{log.level}</span>
                     <span className="text-gray-300">{log.event}: {log.details}</span>
                 </div>
             ))}
@@ -251,7 +256,6 @@ export default function AdminDashboard() {
                     <input className="w-full bg-black border border-gray-700 text-white p-2 text-sm rounded" placeholder="Tech Stack (comma separated)" value={newProject.technologies} onChange={e => setNewProject({...newProject, technologies: e.target.value})} />
                   </>
                 )}
-                {/* Skills and Blogs forms can be added here similar to projects */}
                 <button className="w-full bg-red-600 text-black font-bold py-3 rounded hover:bg-white transition-colors">SUBMIT</button>
              </form>
           </div>
