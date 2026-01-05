@@ -4,7 +4,7 @@ import { AuthContext } from '../../context/AuthContext';
 import API from '../../api/axiosConfig';
 import { 
   LogOut, Plus, Trash2, Terminal, Cpu, FileText, X, 
-  Loader2, RefreshCw, MessageSquare, Shield 
+  Loader2, RefreshCw, MessageSquare, Shield, Upload, CheckCircle, AlertTriangle 
 } from 'lucide-react';
 import CyberGlobe from '../../components/CyberGlobe';
 
@@ -14,6 +14,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('projects'); 
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('idle'); // State for Resume Upload
 
   // Data States
   const [projects, setProjects] = useState([]);
@@ -67,7 +68,11 @@ export default function AdminDashboard() {
     }
   };
 
-  useEffect(() => { fetchData(); }, [activeTab]);
+  useEffect(() => { 
+    if (activeTab !== 'resume') {
+        fetchData(); 
+    }
+  }, [activeTab]);
 
   // Create Handler
   const handleCreate = async (e) => {
@@ -89,6 +94,36 @@ export default function AdminDashboard() {
     } catch (error) { 
         console.error("Create Error:", error);
         alert("Operation failed.");
+    }
+  };
+
+  // Resume Upload Handler
+  const handleResumeUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Use FormData for file uploads
+    const formData = new FormData();
+    formData.append('resume', file); 
+
+    setUploadStatus('uploading');
+    
+    // Custom config for file upload (multipart/form-data)
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const uploadConfig = {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+        }
+    };
+
+    try {
+      await API.post('/upload/resume', formData, uploadConfig);
+      setUploadStatus('success');
+      setTimeout(() => setUploadStatus('idle'), 5000);
+    } catch (error) {
+      console.error("Upload failed", error);
+      setUploadStatus('error');
     }
   };
 
@@ -142,6 +177,7 @@ export default function AdminDashboard() {
             { id: 'skills', label: 'SKILLS', icon: <Cpu size={14} /> },
             { id: 'blogs', label: 'BLOGS', icon: <FileText size={14} /> },
             { id: 'messages', label: 'MESSAGES', icon: <MessageSquare size={14} /> },
+            { id: 'resume', label: 'RESUME', icon: <Upload size={14} /> },
             { id: 'logs', label: 'LOGS', icon: <Shield size={14} /> }
           ].map(tab => (
             <button 
@@ -159,7 +195,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Conditional Add Button */}
-        {!['logs', 'messages'].includes(activeTab) && (
+        {!['logs', 'messages', 'resume'].includes(activeTab) && (
           <button onClick={() => setShowModal(true)} className="w-full mb-10 py-5 border border-dashed border-red-900/50 hover:border-red-500 text-red-700 hover:text-red-400 rounded-xl flex items-center justify-center gap-3 font-bold uppercase tracking-widest transition-all">
             <Plus size={20} /> Initialize New {activeTab.slice(0, -1)} Entry
           </button>
@@ -203,6 +239,52 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
+            )}
+
+            {/* RESUME UPLOAD */}
+            {activeTab === 'resume' && (
+                <div className="bg-black/90 border border-gray-800 p-8 rounded-xl">
+                    <h3 className="text-white font-bold mb-4 uppercase flex items-center gap-2">
+                        <Upload size={18} className="text-red-500" /> Update Intel File (PDF)
+                    </h3>
+                    <p className="text-xs text-slate-400 mb-6 border-l-2 border-red-500 pl-3">
+                        Uploading a new file will overwrite the existing 'resume.pdf' on the server.
+                    </p>
+
+                    <div className="border-2 border-dashed border-gray-700 hover:border-red-500 rounded-lg p-10 text-center transition-all bg-black/20 group">
+                        <input 
+                            type="file" 
+                            accept=".pdf" 
+                            onChange={handleResumeUpload}
+                            className="hidden" 
+                            id="resume-upload"
+                        />
+                        <label htmlFor="resume-upload" className="cursor-pointer flex flex-col items-center gap-4">
+                            <div className="p-4 bg-red-900/20 rounded-full text-red-500 group-hover:bg-red-600 group-hover:text-black transition-colors">
+                                <Upload size={32} />
+                            </div>
+                            <span className="text-slate-300 text-sm font-bold uppercase tracking-widest group-hover:text-white">Click to Select New Resume PDF</span>
+                        </label>
+                    </div>
+
+                    {uploadStatus === 'uploading' && (
+                        <div className="mt-6 flex items-center justify-center gap-3 text-yellow-500 animate-pulse text-xs font-bold uppercase">
+                            <Loader2 size={16} className="animate-spin" /> UPLOADING DATA PACKET...
+                        </div>
+                    )}
+                    
+                    {uploadStatus === 'success' && (
+                        <div className="mt-6 p-4 bg-green-900/20 border border-green-500/50 rounded flex items-center gap-3 text-green-400 text-xs font-bold uppercase tracking-wider animate-in fade-in slide-in-from-bottom-2">
+                            <CheckCircle size={16} /> UPLOAD COMPLETE. INTEL FILE UPDATED.
+                        </div>
+                    )}
+                    
+                    {uploadStatus === 'error' && (
+                        <div className="mt-6 p-4 bg-red-900/20 border border-red-500/50 rounded flex items-center gap-3 text-red-400 text-xs font-bold uppercase tracking-wider animate-in fade-in slide-in-from-bottom-2">
+                            <AlertTriangle size={16} /> UPLOAD FAILED. CHECK SERVER CONNECTION.
+                        </div>
+                    )}
+                </div>
             )}
 
             {/* LOGS */}

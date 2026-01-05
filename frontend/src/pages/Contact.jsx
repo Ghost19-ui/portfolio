@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import API from '../api/axiosConfig';
 import HoloCard from '../components/HoloCard';
-import { Send, Loader2, CheckCircle, AlertTriangle, WifiOff } from 'lucide-react';
+import { Send, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
 
 const Contact = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    email: '', 
+    message: '' 
+  });
   const [status, setStatus] = useState('idle');
-  const [debugError, setDebugError] = useState(''); // Stores the real error message
+  const [debugError, setDebugError] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,26 +22,20 @@ const Contact = () => {
     setDebugError('');
 
     try {
-      // Trying the standard /contact endpoint
+      // Reverted to sending ONLY standard fields to avoid 400 Errors
       await API.post('/contact', formData);
       
       setStatus('success');
       setFormData({ name: '', email: '', message: '' });
       
     } catch (error) {
-      console.error("Message Transmission Failed:", error);
+      console.error("Transmission Failed:", error);
       setStatus('error');
       
-      // CAPTURE THE EXACT ERROR
       if (error.response) {
-        // Server responded with a status code (404, 500, 400)
-        setDebugError(`Server Error (${error.response.status}): ${error.response.data.message || error.response.statusText}`);
-      } else if (error.request) {
-        // Request made but no response (Network Error)
-        setDebugError('Network Error: No response from server. Check backend URL.');
+        setDebugError(`Server Error (${error.response.status}): ${error.response.data.message || 'Data rejected by server'}`);
       } else {
-        // Something else happened
-        setDebugError(`Client Error: ${error.message}`);
+        setDebugError('Network Error: Target unreachable.');
       }
     }
   };
@@ -63,55 +61,38 @@ const Contact = () => {
               </div>
               <h3 className="text-xl text-green-400 font-mono font-bold mb-2">TRANSMISSION COMPLETE</h3>
               <p className="text-slate-400 text-sm">Your intel has been securely received.</p>
-              <button 
-                onClick={() => setStatus('idle')}
-                className="mt-6 text-xs uppercase tracking-widest text-green-500 hover:text-white underline"
-              >
+              <button onClick={() => setStatus('idle')} className="mt-6 text-xs uppercase tracking-widest text-green-500 hover:text-white underline">
                 Send Another Packet
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              
-              <div className="space-y-2">
-                <label className="text-[10px] text-red-500 uppercase tracking-widest font-bold font-mono">Agent Identity</label>
-                <input type="text" name="name" required value={formData.name} onChange={handleChange} placeholder="Enter your alias" className="w-full bg-black/80 border border-red-900/50 text-white p-4 rounded focus:border-red-500 focus:outline-none font-mono text-sm transition-all" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] text-red-500 uppercase tracking-widest font-bold font-mono">Return Frequency</label>
-                <input type="email" name="email" required value={formData.email} onChange={handleChange} placeholder="secure@frequency.com" className="w-full bg-black/80 border border-red-900/50 text-white p-4 rounded focus:border-red-500 focus:outline-none font-mono text-sm transition-all" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-red-500 uppercase tracking-widest font-bold font-mono">Agent Identity</label>
+                  <input type="text" name="name" required value={formData.name} onChange={handleChange} placeholder="Enter your alias" className="w-full bg-black/80 border border-red-900/50 text-white p-4 rounded focus:border-red-500 focus:outline-none font-mono text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] text-red-500 uppercase tracking-widest font-bold font-mono">Return Frequency</label>
+                  <input type="email" name="email" required value={formData.email} onChange={handleChange} placeholder="secure@frequency.com" className="w-full bg-black/80 border border-red-900/50 text-white p-4 rounded focus:border-red-500 focus:outline-none font-mono text-sm" />
+                </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-[10px] text-red-500 uppercase tracking-widest font-bold font-mono">Payload</label>
-                <textarea name="message" required rows="5" value={formData.message} onChange={handleChange} placeholder="Enter encrypted message packet..." className="w-full bg-black/80 border border-red-900/50 text-white p-4 rounded focus:border-red-500 focus:outline-none font-mono text-sm transition-all resize-none"></textarea>
+                <textarea name="message" required minLength="5" rows="5" value={formData.message} onChange={handleChange} placeholder="Enter encrypted message packet..." className="w-full bg-black/80 border border-red-900/50 text-white p-4 rounded focus:border-red-500 focus:outline-none font-mono text-sm resize-none"></textarea>
               </div>
 
-              {/* DEBUG ERROR MESSAGE DISPLAY */}
               {status === 'error' && (
                 <div className="flex flex-col gap-1 text-red-400 bg-red-950/30 p-4 rounded border-l-4 border-red-600 text-xs font-mono animate-pulse">
-                  <div className="flex items-center gap-2 font-bold uppercase">
-                     <AlertTriangle size={14} /> TRANSMISSION FAILURE
-                  </div>
-                  <div className="opacity-80">
-                    &gt; {debugError}
-                  </div>
+                   <div className="flex items-center gap-2 font-bold uppercase"><AlertTriangle size={14} /> TRANSMISSION FAILURE</div>
+                   <div className="opacity-80 break-all">&gt; {debugError}</div>
                 </div>
               )}
 
-              <button
-                type="submit"
-                disabled={status === 'loading'}
-                className="w-full bg-red-600 hover:bg-white hover:text-red-900 text-black font-bold py-4 uppercase tracking-[0.2em] transition-all clip-path-polygon flex items-center justify-center gap-2 mt-2 group"
-              >
-                {status === 'loading' ? (
-                  <><Loader2 size={18} className="animate-spin" /> ENCRYPTING...</>
-                ) : (
-                  <><Send size={16} className="group-hover:translate-x-1 transition-transform" /> TRANSMIT DATA</>
-                )}
+              <button type="submit" disabled={status === 'loading'} className="w-full bg-red-600 hover:bg-white hover:text-red-900 text-black font-bold py-4 uppercase tracking-[0.2em] transition-all clip-path-polygon flex items-center justify-center gap-2 mt-2 group">
+                {status === 'loading' ? <><Loader2 size={18} className="animate-spin" /> ENCRYPTING...</> : <><Send size={16} className="group-hover:translate-x-1 transition-transform" /> TRANSMIT DATA</>}
               </button>
-
             </form>
           )}
         </HoloCard>
