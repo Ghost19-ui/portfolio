@@ -4,23 +4,27 @@ import { AuthContext } from '../../context/AuthContext';
 import API from '../../api/axiosConfig';
 import { 
   LogOut, Plus, Trash2, Terminal, Cpu, FileText, X, 
-  Loader2, RefreshCw, MessageSquare, Shield, Upload, CheckCircle, AlertTriangle 
+  Loader2, RefreshCw, MessageSquare, Shield, Upload, CheckCircle, AlertTriangle, Bug 
 } from 'lucide-react';
 import HoloCard from '../../components/HoloCard';
 
 export default function AdminDashboard() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('messages'); // Default to messages to check immediately
+  const [activeTab, setActiveTab] = useState('messages'); 
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('idle');
 
+  // Data States
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
   const [blogs, setBlogs] = useState([]);
   const [messages, setMessages] = useState([]); 
   const [logs, setLogs] = useState([]); 
+  
+  // DEBUG STATE: Stores the raw server response to show on screen
+  const [debugLog, setDebugLog] = useState(null);
 
   const [newProject, setNewProject] = useState({ title: '', description: '', image: '', githubLink: '', technologies: '' });
   const [newSkill, setNewSkill] = useState({ category: 'Cybersecurity', name: '', level: 50 });
@@ -33,7 +37,9 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     setLoading(true);
+    setDebugLog(null); // Clear previous debug info
     const config = getAuthConfig();
+    
     try {
       if (activeTab === 'projects') {
         const { data } = await API.get('/projects', config);
@@ -45,10 +51,14 @@ export default function AdminDashboard() {
         const { data } = await API.get('/content/blogs', config);
         setBlogs(Array.isArray(data) ? data : (data.blogs || []));
       } else if (activeTab === 'messages') {
-        const { data } = await API.get('/admin/messages', config);
-        console.log("Raw Messages Data:", data); // Check Console (F12) if this fails!
+        const response = await API.get('/admin/messages', config);
         
-        // AGGRESSIVE DATA FINDER: Checks all common backend response patterns
+        // --- DEBUG: CAPTURE RAW DATA ---
+        console.log("FULL API RESPONSE:", response);
+        setDebugLog(response.data); // Save raw data to show on screen
+        // -------------------------------
+
+        const data = response.data;
         const msgs = Array.isArray(data) ? data 
           : (data.messages || data.data || data.result || []);
         
@@ -58,7 +68,6 @@ export default function AdminDashboard() {
             const { data } = await API.get('/admin/logs', config);
             setLogs(Array.isArray(data) ? data : []);
         } catch (logError) {
-            // Fallback Logs
             setLogs([
                 { timestamp: new Date(), level: 'INFO', event: 'SYSTEM', details: 'Admin Dashboard Initialized' },
                 { timestamp: new Date(Date.now() - 10000), level: 'SUCCESS', event: 'AUTH', details: `Operator ${user?.name || 'Admin'} logged in` },
@@ -67,6 +76,7 @@ export default function AdminDashboard() {
       }
     } catch (e) { 
         console.error("Fetch Error:", e);
+        setDebugLog({ error: e.message, status: e.response?.status, data: e.response?.data });
     } finally { 
         setLoading(false); 
     }
@@ -176,24 +186,22 @@ export default function AdminDashboard() {
           <div className="flex justify-center py-10 text-red-500 animate-pulse"><Loader2 className="animate-spin" /></div>
         ) : (
           <>
-            {/* PROJECTS */}
-            {activeTab === 'projects' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {projects.map(p => (
-                  <div key={p._id} className="bg-black/40 border border-gray-800 p-4 rounded hover:border-red-600 group relative">
-                    <h3 className="font-bold text-white">{p.title}</h3>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{p.description}</p>
-                    <button onClick={() => handleDelete(p._id, 'project')} className="absolute top-4 right-4 text-gray-600 hover:text-red-500"><Trash2 size={16}/></button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* MESSAGES - UPDATED */}
+            {/* MESSAGES - WITH DEBUG MODE */}
             {activeTab === 'messages' && (
-              <div className="space-y-3">
-                {messages.length === 0 ? <p className="text-gray-500 text-center text-sm">No new intel.</p> : messages.map(m => (
-                  <div key={m._id} className="bg-black/40 border border-red-900/30 p-4 rounded relative">
+              <div className="space-y-4">
+                {/* --- DEBUG WINDOW --- */}
+                <div className="bg-zinc-900 border border-yellow-500/50 p-4 rounded text-[10px] font-mono mb-6">
+                    <div className="flex items-center gap-2 text-yellow-500 font-bold mb-2">
+                        <Bug size={14} /> RAW SERVER RESPONSE (For Debugging)
+                    </div>
+                    <pre className="text-green-400 whitespace-pre-wrap overflow-x-auto max-h-40">
+                        {debugLog ? JSON.stringify(debugLog, null, 2) : "Fetching data..."}
+                    </pre>
+                </div>
+                {/* --------------------- */}
+
+                {messages.length === 0 ? <p className="text-gray-500 text-center text-sm">No new intel.</p> : messages.map((m, idx) => (
+                  <div key={m._id || idx} className="bg-black/40 border border-red-900/30 p-4 rounded relative">
                     <div className="flex justify-between items-start">
                       <div>
                         <span className="text-red-400 font-bold text-sm">{m.name || m.sender || 'Unknown Agent'}</span> 
@@ -203,11 +211,23 @@ export default function AdminDashboard() {
                         {m.createdAt ? new Date(m.createdAt).toLocaleDateString() : 'Unknown Date'}
                       </span>
                     </div>
-                    {/* Handles multiple potential field names */}
                     <p className="text-gray-300 text-sm mt-2 italic">
                         "{m.content || m.message || 'No Content Decrypted'}"
                     </p>
                     <button onClick={() => handleDelete(m._id, 'message')} className="absolute bottom-4 right-4 text-gray-600 hover:text-red-500"><Trash2 size={14}/></button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* PROJECTS */}
+            {activeTab === 'projects' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {projects.map(p => (
+                  <div key={p._id} className="bg-black/40 border border-gray-800 p-4 rounded hover:border-red-600 group relative">
+                    <h3 className="font-bold text-white">{p.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{p.description}</p>
+                    <button onClick={() => handleDelete(p._id, 'project')} className="absolute top-4 right-4 text-gray-600 hover:text-red-500"><Trash2 size={16}/></button>
                   </div>
                 ))}
               </div>
