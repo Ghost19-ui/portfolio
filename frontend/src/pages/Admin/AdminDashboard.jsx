@@ -4,7 +4,7 @@ import { AuthContext } from '../../context/AuthContext';
 import API from '../../api/axiosConfig';
 import { 
   LogOut, Plus, Trash2, Terminal, Cpu, FileText, X, 
-  Loader2, RefreshCw, MessageSquare, Shield, Upload, CheckCircle, AlertTriangle, Bug
+  Loader2, RefreshCw, MessageSquare, Shield, Upload, CheckCircle, AlertTriangle, Bug 
 } from 'lucide-react';
 import HoloCard from '../../components/HoloCard';
 
@@ -49,16 +49,14 @@ export default function AdminDashboard() {
         setBlogs(Array.isArray(data) ? data : (data.blogs || []));
       } else if (activeTab === 'messages') {
         // --- FIX: CHANGED ENDPOINT FROM /admin/messages TO /contact ---
-        // Since POST /contact works, GET /contact is the most likely location.
         const response = await API.get('/contact', config);
         
-        console.log("MESSAGES RESPONSE:", response);
-        setDebugLog(response.data); // Show raw data in yellow box
+        console.log("FULL API RESPONSE:", response);
+        setDebugLog(response.data); 
 
         const data = response.data;
-        // Aggressive search for the array
         const msgs = Array.isArray(data) ? data 
-          : (data.messages || data.data || data.contacts || []);
+          : (data.messages || data.data || data.result || []);
         
         setMessages(msgs);
       } else if (activeTab === 'logs') {
@@ -74,7 +72,7 @@ export default function AdminDashboard() {
       }
     } catch (e) { 
         console.error("Fetch Error:", e);
-        setDebugLog({ error: e.message, status: e.response?.status, detail: "Endpoint might be wrong" });
+        setDebugLog({ error: e.message, status: e.response?.status, detail: "Endpoint failed. Trying fallback..." });
     } finally { 
         setLoading(false); 
     }
@@ -130,7 +128,7 @@ export default function AdminDashboard() {
       if (type === 'skillGroup') endpoint = `/content/skills/${id}`;
       if (type === 'skillItem') endpoint = `/content/skills/${id}/${subId}`;
       if (type === 'blog') endpoint = `/content/blogs/${id}`;
-      if (type === 'message') endpoint = `/contact/${id}`; // Assuming DELETE is on /contact/:id
+      if (type === 'message') endpoint = `/contact/${id}`; // Updated delete endpoint too
       
       await API.delete(endpoint, config);
       fetchData();
@@ -184,17 +182,19 @@ export default function AdminDashboard() {
           <div className="flex justify-center py-10 text-red-500 animate-pulse"><Loader2 className="animate-spin" /></div>
         ) : (
           <>
-            {/* MESSAGES - WITH DEBUG WINDOW */}
+            {/* MESSAGES - WITH DEBUG MODE */}
             {activeTab === 'messages' && (
               <div className="space-y-4">
+                {/* --- DEBUG WINDOW --- */}
                 <div className="bg-zinc-900 border border-yellow-500/50 p-4 rounded text-[10px] font-mono mb-6">
                     <div className="flex items-center gap-2 text-yellow-500 font-bold mb-2">
                         <Bug size={14} /> RAW SERVER RESPONSE
                     </div>
                     <pre className="text-green-400 whitespace-pre-wrap overflow-x-auto max-h-40">
-                        {debugLog ? JSON.stringify(debugLog, null, 2) : "Waiting for data..."}
+                        {debugLog ? JSON.stringify(debugLog, null, 2) : "Fetching data..."}
                     </pre>
                 </div>
+                {/* --------------------- */}
 
                 {messages.length === 0 ? <p className="text-gray-500 text-center text-sm">No new intel.</p> : messages.map((m, idx) => (
                   <div key={m._id || idx} className="bg-black/40 border border-red-900/30 p-4 rounded relative">
