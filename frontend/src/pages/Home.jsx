@@ -7,16 +7,12 @@ const Home = () => {
   return (
     <div className="min-h-screen flex items-start md:items-center justify-center p-4 pt-36 md:pt-20 relative z-10">
       
-      {/* Container: Flex column on mobile, Grid on Desktop */}
-      <div className="w-full max-w-6xl flex flex-col lg:grid lg:grid-cols-12 gap-8 items-center">
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         
-        {/* --- BIO & INTEL --- */}
-        {/* Mobile: order-first (Top) */}
-        {/* Desktop: lg:col-span-7 (Right Side via DOM order if mapped correctly, wait - grid placement is better) */}
-        {/* Actually, let's just swap DOM order. Text FIRST in code = Text FIRST on mobile (natural flow). */}
-        {/* Then use lg:order-2 to move it to the right on desktop. */}
-        
-        <div className="w-full lg:col-span-7 flex flex-col justify-center order-first lg:order-last">
+        {/* --- 1. BIO & INTEL (HTML: First) --- */}
+        {/* Mobile: Shows first (top) naturally. */}
+        {/* Desktop: lg:order-2 moves it to the right side. */}
+        <div className="lg:col-span-7 flex flex-col justify-center order-1 lg:order-2">
           <HoloCard title="OPERATOR_PROFILE">
              
              <div className="font-mono text-[10px] md:text-xs text-red-500 mb-4 opacity-80 border-l-2 border-red-600 pl-3">
@@ -60,11 +56,10 @@ const Home = () => {
           </HoloCard>
         </div>
 
-        {/* --- PHOTO & SOCIALS --- */}
-        {/* Mobile: order-last (Bottom) */}
-        {/* Desktop: lg:col-span-5 (Left Side via order-first) */}
-        
-        <div className="w-full lg:col-span-5 flex flex-col gap-6 order-last lg:order-first">
+        {/* --- 2. PHOTO & SOCIALS (HTML: Second) --- */}
+        {/* Mobile: Shows second (bottom) naturally. */}
+        {/* Desktop: lg:order-1 moves it to the left side. */}
+        <div className="lg:col-span-5 flex flex-col gap-6 order-2 lg:order-1">
            
            {/* Profile Photo */}
            <div className="relative group w-full">

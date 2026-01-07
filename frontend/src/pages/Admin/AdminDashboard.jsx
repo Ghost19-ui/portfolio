@@ -4,7 +4,7 @@ import { AuthContext } from '../../context/AuthContext';
 import API from '../../api/axiosConfig';
 import { 
   LogOut, Plus, Trash2, Terminal, Cpu, FileText, X, 
-  Loader2, RefreshCw, MessageSquare, Shield, Upload, CheckCircle, AlertTriangle, Bug 
+  Loader2, RefreshCw, MessageSquare, Shield, Upload, CheckCircle, AlertTriangle 
 } from 'lucide-react';
 import HoloCard from '../../components/HoloCard';
 
@@ -15,9 +15,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('idle');
-  
-  // Debug state to see what the server returns
-  const [debugLog, setDebugLog] = useState(null);
 
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
@@ -36,9 +33,7 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     setLoading(true);
-    setDebugLog(null);
     const config = getAuthConfig();
-    
     try {
       if (activeTab === 'projects') {
         const { data } = await API.get('/projects', config);
@@ -50,32 +45,27 @@ export default function AdminDashboard() {
         const { data } = await API.get('/content/blogs', config);
         setBlogs(Array.isArray(data) ? data : (data.blogs || []));
       } else if (activeTab === 'messages') {
-        // --- FIX: UPDATED ENDPOINT TO MATCH YOUR BACKEND CODE ---
+        // Fetching from the working endpoint
         const response = await API.get('/contact/messages', config);
-        
-        console.log("FULL API RESPONSE:", response);
-        setDebugLog(response.data); 
-
         const data = response.data;
-        // Aggressive check for message data in any format
-        const msgs = Array.isArray(data) ? data 
-          : (data.messages || data.data || data.result || []);
-        
+        // Handle various response structures
+        const msgs = Array.isArray(data) ? data : (data.messages || data.data || []);
         setMessages(msgs);
       } else if (activeTab === 'logs') {
         try {
             const { data } = await API.get('/admin/logs', config);
             setLogs(Array.isArray(data) ? data : []);
         } catch (logError) {
+            // Simulation Logs (Perfect for Portfolio)
             setLogs([
                 { timestamp: new Date(), level: 'INFO', event: 'SYSTEM', details: 'Admin Dashboard Initialized' },
                 { timestamp: new Date(Date.now() - 10000), level: 'SUCCESS', event: 'AUTH', details: `Operator ${user?.name || 'Admin'} logged in` },
+                { timestamp: new Date(Date.now() - 50000), level: 'WARNING', event: 'NETWORK', details: 'Monitoring active connections...' },
             ]);
         }
       }
     } catch (e) { 
         console.error("Fetch Error:", e);
-        setDebugLog({ error: e.message, status: e.response?.status, detail: "Failed to fetch data." });
     } finally { 
         setLoading(false); 
     }
@@ -131,7 +121,7 @@ export default function AdminDashboard() {
       if (type === 'skillGroup') endpoint = `/content/skills/${id}`;
       if (type === 'skillItem') endpoint = `/content/skills/${id}/${subId}`;
       if (type === 'blog') endpoint = `/content/blogs/${id}`;
-      if (type === 'message') endpoint = `/contact/${id}`; // Correct endpoint based on router.delete('/:id')
+      if (type === 'message') endpoint = `/contact/${id}`; 
       
       await API.delete(endpoint, config);
       fetchData();
@@ -185,22 +175,24 @@ export default function AdminDashboard() {
           <div className="flex justify-center py-10 text-red-500 animate-pulse"><Loader2 className="animate-spin" /></div>
         ) : (
           <>
-            {/* MESSAGES - WITH DEBUG MODE */}
-            {activeTab === 'messages' && (
-              <div className="space-y-4">
-                {/* --- DEBUG WINDOW --- */}
-                <div className="bg-zinc-900 border border-yellow-500/50 p-4 rounded text-[10px] font-mono mb-6">
-                    <div className="flex items-center gap-2 text-yellow-500 font-bold mb-2">
-                        <Bug size={14} /> RAW SERVER RESPONSE
-                    </div>
-                    <pre className="text-green-400 whitespace-pre-wrap overflow-x-auto max-h-40">
-                        {debugLog ? JSON.stringify(debugLog, null, 2) : "Fetching data..."}
-                    </pre>
-                </div>
-                {/* --------------------- */}
+            {/* PROJECTS */}
+            {activeTab === 'projects' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {projects.map(p => (
+                  <div key={p._id} className="bg-black/40 border border-gray-800 p-4 rounded hover:border-red-600 group relative">
+                    <h3 className="font-bold text-white">{p.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{p.description}</p>
+                    <button onClick={() => handleDelete(p._id, 'project')} className="absolute top-4 right-4 text-gray-600 hover:text-red-500"><Trash2 size={16}/></button>
+                  </div>
+                ))}
+              </div>
+            )}
 
-                {messages.length === 0 ? <p className="text-gray-500 text-center text-sm">No new intel.</p> : messages.map((m, idx) => (
-                  <div key={m._id || idx} className="bg-black/40 border border-red-900/30 p-4 rounded relative">
+            {/* MESSAGES */}
+            {activeTab === 'messages' && (
+              <div className="space-y-3">
+                {messages.length === 0 ? <p className="text-gray-500 text-center text-sm">No new intel.</p> : messages.map(m => (
+                  <div key={m._id} className="bg-black/40 border border-red-900/30 p-4 rounded relative">
                     <div className="flex justify-between items-start">
                       <div>
                         <span className="text-red-400 font-bold text-sm">{m.name || m.sender || 'Unknown Agent'}</span> 
@@ -214,19 +206,6 @@ export default function AdminDashboard() {
                         "{m.content || m.message || 'No Content Decrypted'}"
                     </p>
                     <button onClick={() => handleDelete(m._id, 'message')} className="absolute bottom-4 right-4 text-gray-600 hover:text-red-500"><Trash2 size={14}/></button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* PROJECTS */}
-            {activeTab === 'projects' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {projects.map(p => (
-                  <div key={p._id} className="bg-black/40 border border-gray-800 p-4 rounded hover:border-red-600 group relative">
-                    <h3 className="font-bold text-white">{p.title}</h3>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{p.description}</p>
-                    <button onClick={() => handleDelete(p._id, 'project')} className="absolute top-4 right-4 text-gray-600 hover:text-red-500"><Trash2 size={16}/></button>
                   </div>
                 ))}
               </div>
@@ -277,6 +256,7 @@ export default function AdminDashboard() {
                     <input className="w-full bg-black border border-gray-700 text-white p-2 text-sm rounded" placeholder="Tech Stack (comma separated)" value={newProject.technologies} onChange={e => setNewProject({...newProject, technologies: e.target.value})} />
                   </>
                 )}
+                {/* Skills/Blogs inputs */}
                 <button className="w-full bg-red-600 text-black font-bold py-3 rounded hover:bg-white transition-colors">SUBMIT</button>
              </form>
           </div>
