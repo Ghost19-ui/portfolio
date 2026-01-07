@@ -15,6 +15,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('idle');
+  
+  // Debug state to see what the server returns
   const [debugLog, setDebugLog] = useState(null);
 
   const [projects, setProjects] = useState([]);
@@ -48,13 +50,14 @@ export default function AdminDashboard() {
         const { data } = await API.get('/content/blogs', config);
         setBlogs(Array.isArray(data) ? data : (data.blogs || []));
       } else if (activeTab === 'messages') {
-        // --- FIX: CHANGED ENDPOINT FROM /admin/messages TO /contact ---
-        const response = await API.get('/contact', config);
+        // --- FIX: UPDATED ENDPOINT TO MATCH YOUR BACKEND CODE ---
+        const response = await API.get('/contact/messages', config);
         
         console.log("FULL API RESPONSE:", response);
         setDebugLog(response.data); 
 
         const data = response.data;
+        // Aggressive check for message data in any format
         const msgs = Array.isArray(data) ? data 
           : (data.messages || data.data || data.result || []);
         
@@ -72,7 +75,7 @@ export default function AdminDashboard() {
       }
     } catch (e) { 
         console.error("Fetch Error:", e);
-        setDebugLog({ error: e.message, status: e.response?.status, detail: "Endpoint failed. Trying fallback..." });
+        setDebugLog({ error: e.message, status: e.response?.status, detail: "Failed to fetch data." });
     } finally { 
         setLoading(false); 
     }
@@ -128,7 +131,7 @@ export default function AdminDashboard() {
       if (type === 'skillGroup') endpoint = `/content/skills/${id}`;
       if (type === 'skillItem') endpoint = `/content/skills/${id}/${subId}`;
       if (type === 'blog') endpoint = `/content/blogs/${id}`;
-      if (type === 'message') endpoint = `/contact/${id}`; // Updated delete endpoint too
+      if (type === 'message') endpoint = `/contact/${id}`; // Correct endpoint based on router.delete('/:id')
       
       await API.delete(endpoint, config);
       fetchData();
