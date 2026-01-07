@@ -4,7 +4,7 @@ import { AuthContext } from '../../context/AuthContext';
 import API from '../../api/axiosConfig';
 import { 
   LogOut, Plus, Trash2, Terminal, Cpu, FileText, X, 
-  Loader2, RefreshCw, MessageSquare, Shield, Upload, CheckCircle, AlertTriangle, Bug 
+  Loader2, RefreshCw, MessageSquare, Shield, Upload, CheckCircle, AlertTriangle, Bug
 } from 'lucide-react';
 import HoloCard from '../../components/HoloCard';
 
@@ -15,16 +15,13 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('idle');
+  const [debugLog, setDebugLog] = useState(null);
 
-  // Data States
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
   const [blogs, setBlogs] = useState([]);
   const [messages, setMessages] = useState([]); 
   const [logs, setLogs] = useState([]); 
-  
-  // DEBUG STATE: Stores the raw server response to show on screen
-  const [debugLog, setDebugLog] = useState(null);
 
   const [newProject, setNewProject] = useState({ title: '', description: '', image: '', githubLink: '', technologies: '' });
   const [newSkill, setNewSkill] = useState({ category: 'Cybersecurity', name: '', level: 50 });
@@ -37,7 +34,7 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     setLoading(true);
-    setDebugLog(null); // Clear previous debug info
+    setDebugLog(null);
     const config = getAuthConfig();
     
     try {
@@ -51,16 +48,17 @@ export default function AdminDashboard() {
         const { data } = await API.get('/content/blogs', config);
         setBlogs(Array.isArray(data) ? data : (data.blogs || []));
       } else if (activeTab === 'messages') {
-        const response = await API.get('/admin/messages', config);
+        // --- FIX: CHANGED ENDPOINT FROM /admin/messages TO /contact ---
+        // Since POST /contact works, GET /contact is the most likely location.
+        const response = await API.get('/contact', config);
         
-        // --- DEBUG: CAPTURE RAW DATA ---
-        console.log("FULL API RESPONSE:", response);
-        setDebugLog(response.data); // Save raw data to show on screen
-        // -------------------------------
+        console.log("MESSAGES RESPONSE:", response);
+        setDebugLog(response.data); // Show raw data in yellow box
 
         const data = response.data;
+        // Aggressive search for the array
         const msgs = Array.isArray(data) ? data 
-          : (data.messages || data.data || data.result || []);
+          : (data.messages || data.data || data.contacts || []);
         
         setMessages(msgs);
       } else if (activeTab === 'logs') {
@@ -76,7 +74,7 @@ export default function AdminDashboard() {
       }
     } catch (e) { 
         console.error("Fetch Error:", e);
-        setDebugLog({ error: e.message, status: e.response?.status, data: e.response?.data });
+        setDebugLog({ error: e.message, status: e.response?.status, detail: "Endpoint might be wrong" });
     } finally { 
         setLoading(false); 
     }
@@ -132,7 +130,7 @@ export default function AdminDashboard() {
       if (type === 'skillGroup') endpoint = `/content/skills/${id}`;
       if (type === 'skillItem') endpoint = `/content/skills/${id}/${subId}`;
       if (type === 'blog') endpoint = `/content/blogs/${id}`;
-      if (type === 'message') endpoint = `/admin/messages/${id}`; 
+      if (type === 'message') endpoint = `/contact/${id}`; // Assuming DELETE is on /contact/:id
       
       await API.delete(endpoint, config);
       fetchData();
@@ -186,19 +184,17 @@ export default function AdminDashboard() {
           <div className="flex justify-center py-10 text-red-500 animate-pulse"><Loader2 className="animate-spin" /></div>
         ) : (
           <>
-            {/* MESSAGES - WITH DEBUG MODE */}
+            {/* MESSAGES - WITH DEBUG WINDOW */}
             {activeTab === 'messages' && (
               <div className="space-y-4">
-                {/* --- DEBUG WINDOW --- */}
                 <div className="bg-zinc-900 border border-yellow-500/50 p-4 rounded text-[10px] font-mono mb-6">
                     <div className="flex items-center gap-2 text-yellow-500 font-bold mb-2">
-                        <Bug size={14} /> RAW SERVER RESPONSE (For Debugging)
+                        <Bug size={14} /> RAW SERVER RESPONSE
                     </div>
                     <pre className="text-green-400 whitespace-pre-wrap overflow-x-auto max-h-40">
-                        {debugLog ? JSON.stringify(debugLog, null, 2) : "Fetching data..."}
+                        {debugLog ? JSON.stringify(debugLog, null, 2) : "Waiting for data..."}
                     </pre>
                 </div>
-                {/* --------------------- */}
 
                 {messages.length === 0 ? <p className="text-gray-500 text-center text-sm">No new intel.</p> : messages.map((m, idx) => (
                   <div key={m._id || idx} className="bg-black/40 border border-red-900/30 p-4 rounded relative">

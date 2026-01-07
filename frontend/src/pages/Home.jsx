@@ -7,10 +7,11 @@ const Home = () => {
   return (
     <div className="min-h-screen flex items-start md:items-center justify-center p-4 pt-36 md:pt-20 relative z-10">
       
-      {/* Container: Flex column on mobile, Grid on Desktop */}
+      {/* Grid container handles layout switching */}
       <div className="w-full max-w-6xl flex flex-col lg:grid lg:grid-cols-12 gap-8 items-center">
         
-        {/* --- BIO & INTEL (Right on Desktop, FIRST on Mobile) --- */}
+        {/* --- TEXT SECTION (BIO) --- */}
+        {/* MOBILE: Order 1 (Top) | DESKTOP: Order 2 (Right) */}
         <div className="lg:col-span-7 flex flex-col justify-center order-1 lg:order-2 w-full">
           <HoloCard title="OPERATOR_PROFILE">
              
@@ -55,7 +56,8 @@ const Home = () => {
           </HoloCard>
         </div>
 
-        {/* --- PHOTO & SOCIALS (Left on Desktop, SECOND on Mobile) --- */}
+        {/* --- PHOTO & SOCIALS --- */}
+        {/* MOBILE: Order 2 (Bottom) | DESKTOP: Order 1 (Left) */}
         <div className="lg:col-span-5 flex flex-col gap-6 order-2 lg:order-1 w-full">
            
            {/* Profile Photo */}
