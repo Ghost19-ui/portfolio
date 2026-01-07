@@ -9,10 +9,12 @@ const Home = () => {
       
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         
-        {/* --- 1. BIO & INTEL (HTML: First) --- */}
-        {/* Mobile: Shows first (top) naturally. */}
-        {/* Desktop: lg:order-2 moves it to the right side. */}
-        <div className="lg:col-span-7 flex flex-col justify-center order-1 lg:order-2">
+        {/* =========================================================
+            SECTION 1: BIO & NAME
+            (Placed FIRST in code so it appears at the TOP on Mobile)
+           ========================================================= */}
+        {/* On Desktop (lg): order-2 moves it to the RIGHT side */}
+        <div className="w-full lg:col-span-7 flex flex-col justify-center order-1 lg:order-2">
           <HoloCard title="OPERATOR_PROFILE">
              
              <div className="font-mono text-[10px] md:text-xs text-red-500 mb-4 opacity-80 border-l-2 border-red-600 pl-3">
@@ -21,7 +23,8 @@ const Home = () => {
                 <p>&gt; STATUS: <span className="text-green-500 animate-pulse">ONLINE</span></p>
              </div>
              
-             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-mono text-white mb-3 md:mb-4 tracking-tighter leading-none">
+             {/* RESPONSIVE TEXT SIZING: text-5xl on mobile, text-7xl on desktop */}
+             <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold font-mono text-white mb-3 md:mb-4 tracking-tighter leading-none">
                 TUSHAR <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-900">
                   SAINI
@@ -56,10 +59,12 @@ const Home = () => {
           </HoloCard>
         </div>
 
-        {/* --- 2. PHOTO & SOCIALS (HTML: Second) --- */}
-        {/* Mobile: Shows second (bottom) naturally. */}
-        {/* Desktop: lg:order-1 moves it to the left side. */}
-        <div className="lg:col-span-5 flex flex-col gap-6 order-2 lg:order-1">
+        {/* =========================================================
+            SECTION 2: PHOTO & SOCIALS
+            (Placed SECOND in code so it appears at the BOTTOM on Mobile)
+           ========================================================= */}
+        {/* On Desktop (lg): order-1 moves it to the LEFT side */}
+        <div className="w-full lg:col-span-5 flex flex-col gap-6 order-2 lg:order-1">
            
            {/* Profile Photo */}
            <div className="relative group w-full">
