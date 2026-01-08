@@ -9,7 +9,8 @@ const profileSchema = new mongoose.Schema({
     github: { type: String, default: '' },
     linkedin: { type: String, default: '' },
     instagram: { type: String, default: '' },
-    resume: { type: String, default: '' } // Link to resume if needed
+    other: { type: String, default: '' }, // <--- ADDED THIS NEW FIELD
+    resume: { type: String, default: '' }
   }
 }, { timestamps: true });
 

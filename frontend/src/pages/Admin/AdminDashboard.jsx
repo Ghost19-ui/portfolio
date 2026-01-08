@@ -3,35 +3,37 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import API from '../../api/axiosConfig';
 import { 
-  LogOut, Plus, Trash2, Terminal, Cpu, FileText, MessageSquare, Shield, Upload, Save, User 
+  LogOut, Plus, Trash2, Terminal, Cpu, FileText, MessageSquare, Shield, Upload, Save, User, Globe 
 } from 'lucide-react';
 import HoloCard from '../../components/HoloCard';
 
 export default function AdminDashboard() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('profile'); // Default to Profile to edit immediately
+  const [activeTab, setActiveTab] = useState('profile'); 
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('idle');
 
-  // Data States
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
   const [blogs, setBlogs] = useState([]);
   const [messages, setMessages] = useState([]); 
   const [logs, setLogs] = useState([]); 
   
-  // PROFILE STATE
+  // FIXED: Initial state has safe defaults to prevent crashes
   const [profile, setProfile] = useState({
     name: '',
     role: '',
     bio: '',
-    skills: '', // Managed as comma-separated string for input
-    socials: { github: '', linkedin: '', instagram: '' }
+    skills: '', 
+    socials: { github: '', linkedin: '', instagram: '', other: '' } // Added 'other'
   });
 
-  // Helper: Get Auth Headers
+  const [newProject, setNewProject] = useState({ title: '', description: '', image: '', githubLink: '', technologies: '' });
+  const [newSkill, setNewSkill] = useState({ category: 'Cybersecurity', name: '', level: 50 });
+  const [newBlog, setNewBlog] = useState({ title: '', content: '', summary: '', tags: '' });
+
   const getAuthConfig = () => {
     const token = localStorage.getItem("token");
     return { headers: { 'Authorization': `Bearer ${token}` } };
@@ -42,10 +44,15 @@ export default function AdminDashboard() {
     const config = getAuthConfig();
     try {
       if (activeTab === 'profile') {
-        const { data } = await API.get('/profile'); // Public endpoint, no auth needed technically
+        const { data } = await API.get('/profile'); 
+        // SAFETY CHECK: Ensure socials object exists even if DB returns null
+        const safeSocials = data.socials || { github: '', linkedin: '', instagram: '', other: '' };
         setProfile({
-            ...data,
-            skills: data.skills ? data.skills.join(', ') : '' // Convert array to string for input
+            name: data.name || '',
+            role: data.role || '',
+            bio: data.bio || '',
+            skills: data.skills ? data.skills.join(', ') : '',
+            socials: safeSocials
         });
       } else if (activeTab === 'projects') {
         const { data } = await API.get('/projects', config);
@@ -81,14 +88,11 @@ export default function AdminDashboard() {
 
   useEffect(() => { if (activeTab !== 'resume') fetchData(); }, [activeTab]);
 
-  // --- HANDLE PROFILE UPDATE ---
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     const config = getAuthConfig();
     try {
-        // Convert skills string back to array
         const skillsArray = profile.skills.split(',').map(s => s.trim());
-        
         await API.put('/profile', { ...profile, skills: skillsArray }, config);
         alert("Profile Updated Successfully!");
     } catch (error) {
@@ -97,9 +101,25 @@ export default function AdminDashboard() {
     }
   };
 
-  // ... (Keep handleCreate, handleResumeUpload, handleDelete as they were) ...
-  // [I'm abbreviating to save space, but ensure the previous logic for create/delete/upload remains]
-  
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    const config = getAuthConfig();
+    try {
+      if (activeTab === 'projects') {
+        const tech = newProject.technologies.split(',').map(t => t.trim());
+        await API.post('/projects', { ...newProject, technologies: tech }, config);
+      } else if (activeTab === 'skills') {
+        await API.post('/content/skills', newSkill, config);
+      } else if (activeTab === 'blogs') {
+        const tags = newBlog.tags.split(',').map(t => t.trim());
+        await API.post('/content/blogs', { ...newBlog, tags }, config);
+      }
+      setShowModal(false);
+      fetchData();
+      alert("Deployed successfully!");
+    } catch (error) { alert("Operation failed."); }
+  };
+
   const handleResumeUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -163,38 +183,43 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label className="text-xs text-red-500 font-bold mb-2 block uppercase">Full Name</label>
-                        <input className="w-full bg-black border border-gray-700 p-3 rounded text-white" value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} />
+                        <input className="w-full bg-black border border-gray-700 p-3 rounded text-white" value={profile.name || ''} onChange={e => setProfile({...profile, name: e.target.value})} />
                     </div>
                     <div>
                         <label className="text-xs text-red-500 font-bold mb-2 block uppercase">Role / Title</label>
-                        <input className="w-full bg-black border border-gray-700 p-3 rounded text-white" value={profile.role} onChange={e => setProfile({...profile, role: e.target.value})} />
+                        <input className="w-full bg-black border border-gray-700 p-3 rounded text-white" value={profile.role || ''} onChange={e => setProfile({...profile, role: e.target.value})} />
                     </div>
                 </div>
 
                 <div>
                     <label className="text-xs text-red-500 font-bold mb-2 block uppercase">Bio / Description</label>
-                    <textarea rows="4" className="w-full bg-black border border-gray-700 p-3 rounded text-white" value={profile.bio} onChange={e => setProfile({...profile, bio: e.target.value})} />
+                    <textarea rows="4" className="w-full bg-black border border-gray-700 p-3 rounded text-white" value={profile.bio || ''} onChange={e => setProfile({...profile, bio: e.target.value})} />
                 </div>
 
                 <div>
                     <label className="text-xs text-red-500 font-bold mb-2 block uppercase">Skill Chips (Comma Separated)</label>
-                    <input className="w-full bg-black border border-gray-700 p-3 rounded text-white" value={profile.skills} onChange={e => setProfile({...profile, skills: e.target.value})} placeholder="Python, Kali Linux, React..." />
+                    <input className="w-full bg-black border border-gray-700 p-3 rounded text-white" value={profile.skills || ''} onChange={e => setProfile({...profile, skills: e.target.value})} placeholder="Python, Kali Linux, React..." />
                 </div>
 
                 <div className="p-4 border border-gray-800 rounded bg-gray-900/30">
                     <h3 className="text-sm font-bold text-white mb-4">SOCIAL LINKS</h3>
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
-                            <span className="w-20 text-xs text-gray-400">GitHub</span>
-                            <input className="flex-1 bg-black border border-gray-700 p-2 rounded text-white text-sm" value={profile.socials.github} onChange={e => setProfile({...profile, socials: {...profile.socials, github: e.target.value}})} />
+                            <span className="w-24 text-xs text-gray-400">GitHub</span>
+                            <input className="flex-1 bg-black border border-gray-700 p-2 rounded text-white text-sm" value={profile.socials?.github || ''} onChange={e => setProfile({...profile, socials: {...profile.socials, github: e.target.value}})} />
                         </div>
                         <div className="flex items-center gap-4">
-                            <span className="w-20 text-xs text-gray-400">LinkedIn</span>
-                            <input className="flex-1 bg-black border border-gray-700 p-2 rounded text-white text-sm" value={profile.socials.linkedin} onChange={e => setProfile({...profile, socials: {...profile.socials, linkedin: e.target.value}})} />
+                            <span className="w-24 text-xs text-gray-400">LinkedIn</span>
+                            <input className="flex-1 bg-black border border-gray-700 p-2 rounded text-white text-sm" value={profile.socials?.linkedin || ''} onChange={e => setProfile({...profile, socials: {...profile.socials, linkedin: e.target.value}})} />
                         </div>
                         <div className="flex items-center gap-4">
-                            <span className="w-20 text-xs text-gray-400">Instagram</span>
-                            <input className="flex-1 bg-black border border-gray-700 p-2 rounded text-white text-sm" value={profile.socials.instagram} onChange={e => setProfile({...profile, socials: {...profile.socials, instagram: e.target.value}})} />
+                            <span className="w-24 text-xs text-gray-400">Instagram</span>
+                            <input className="flex-1 bg-black border border-gray-700 p-2 rounded text-white text-sm" value={profile.socials?.instagram || ''} onChange={e => setProfile({...profile, socials: {...profile.socials, instagram: e.target.value}})} />
+                        </div>
+                        {/* NEW FIELD FOR TRYHACKME OR OTHER */}
+                        <div className="flex items-center gap-4">
+                            <span className="w-24 text-xs text-red-400">Extra Link</span>
+                            <input className="flex-1 bg-black border border-red-900/50 p-2 rounded text-white text-sm placeholder-gray-600" placeholder="TryHackMe / Twitter URL" value={profile.socials?.other || ''} onChange={e => setProfile({...profile, socials: {...profile.socials, other: e.target.value}})} />
                         </div>
                     </div>
                 </div>
@@ -205,7 +230,7 @@ export default function AdminDashboard() {
             </form>
         )}
 
-        {/* --- EXISTING TABS (Messages, Logs, etc.) --- */}
+        {/* --- MESSAGES --- */}
         {activeTab === 'messages' && (
              <div className="space-y-3">
                 {messages.length === 0 ? <p className="text-gray-500 text-center">No messages.</p> : messages.map(m => (
@@ -221,12 +246,37 @@ export default function AdminDashboard() {
              </div>
         )}
 
-        {/* ... Keep the Resume Upload, Logs, and Modal logic from previous code ... */}
+        {/* --- RESUME UPLOAD --- */}
         {activeTab === 'resume' && (
             <div className="p-10 border-2 border-dashed border-gray-800 hover:border-red-600 rounded-lg text-center">
                 <input type="file" accept=".pdf" onChange={handleResumeUpload} className="hidden" id="resume-upload"/>
                 <label htmlFor="resume-upload" className="cursor-pointer text-red-500 font-bold uppercase hover:text-white">Click to Upload Resume PDF</label>
                 {uploadStatus === 'success' && <p className="text-green-500 mt-2">Success</p>}
+            </div>
+        )}
+
+        {/* --- MODAL FOR PROJECTS/SKILLS --- */}
+        {showModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+              <div className="relative bg-gray-950 border border-red-600 w-full max-w-lg p-6 rounded-lg">
+                 <div className="flex justify-between mb-6">
+                    <h2 className="text-white font-bold uppercase">New Entry</h2>
+                    <button onClick={() => setShowModal(false)}><X className="text-white" /></button>
+                 </div>
+                 <form onSubmit={handleCreate} className="space-y-4">
+                    {activeTab === 'projects' && (
+                      <>
+                        <input className="w-full bg-black border border-gray-700 text-white p-2 text-sm rounded" placeholder="Title" value={newProject.title} onChange={e => setNewProject({...newProject, title: e.target.value})} required />
+                        <textarea className="w-full bg-black border border-gray-700 text-white p-2 text-sm rounded" placeholder="Description" value={newProject.description} onChange={e => setNewProject({...newProject, description: e.target.value})} required />
+                        <input className="w-full bg-black border border-gray-700 text-white p-2 text-sm rounded" placeholder="Github URL" value={newProject.githubLink} onChange={e => setNewProject({...newProject, githubLink: e.target.value})} required />
+                        <input className="w-full bg-black border border-gray-700 text-white p-2 text-sm rounded" placeholder="Image URL" value={newProject.image} onChange={e => setNewProject({...newProject, image: e.target.value})} />
+                        <input className="w-full bg-black border border-gray-700 text-white p-2 text-sm rounded" placeholder="Tech Stack (comma separated)" value={newProject.technologies} onChange={e => setNewProject({...newProject, technologies: e.target.value})} />
+                      </>
+                    )}
+                    <button className="w-full bg-red-600 text-black font-bold py-3 rounded hover:bg-white transition-colors">SUBMIT</button>
+                 </form>
+              </div>
             </div>
         )}
       </HoloCard>

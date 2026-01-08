@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import HoloCard from '../components/HoloCard';
-import { Shield, Terminal, Download, Github, Linkedin, Instagram } from 'lucide-react';
+import { Shield, Terminal, Download, Github, Linkedin, Instagram, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import API from '../api/axiosConfig';
 
 const Home = () => {
-  // Default State (Fallback Data)
+  // Default State with YOUR ACTUAL LINKS (So they show up immediately)
   const [profile, setProfile] = useState({
     name: "TUSHAR SAINI",
     role: "Red Team Operator",
@@ -14,7 +14,8 @@ const Home = () => {
     socials: {
         github: "https://github.com/Ghost19-ui",
         linkedin: "https://www.linkedin.com/in/tushar-kumar-saini-4138a72b2/",
-        instagram: "https://www.instagram.com/tushar_saini___19/"
+        instagram: "https://www.instagram.com/tushar_saini___19/",
+        other: "" // Empty by default until you add it in dashboard
     }
   });
 
@@ -22,7 +23,14 @@ const Home = () => {
     const fetchProfile = async () => {
         try {
             const { data } = await API.get('/profile');
-            if(data) setProfile(data); // Update state if DB data exists
+            if(data) {
+                // Merge with defaults to prevent missing keys
+                setProfile(prev => ({
+                    ...prev,
+                    ...data,
+                    socials: { ...prev.socials, ...data.socials }
+                }));
+            }
         } catch (error) {
             console.log("Using default profile (API not connected)");
         }
@@ -70,21 +78,24 @@ const Home = () => {
                </div>
             </div>
 
-            {/* SOCIALS */}
-            <div className="flex gap-6 text-slate-400">
-               {profile.socials.github && (
-                   <a href={profile.socials.github} target="_blank" rel="noreferrer" className="hover:text-white hover:scale-110 transition-all flex flex-col items-center gap-1 group">
-                      <div className="p-3 bg-white/5 rounded-full group-hover:bg-white/10 border border-white/10 group-hover:border-white/50 transition-all"><Github size={24} /></div>
-                   </a>
-               )}
-               {profile.socials.linkedin && (
-                   <a href={profile.socials.linkedin} target="_blank" rel="noreferrer" className="hover:text-blue-400 hover:scale-110 transition-all flex flex-col items-center gap-1 group">
-                      <div className="p-3 bg-white/5 rounded-full group-hover:bg-blue-500/10 border border-white/10 group-hover:border-blue-500/50 transition-all"><Linkedin size={24} /></div>
-                   </a>
-               )}
-               {profile.socials.instagram && (
-                   <a href={profile.socials.instagram} target="_blank" rel="noreferrer" className="hover:text-pink-500 hover:scale-110 transition-all flex flex-col items-center gap-1 group">
-                      <div className="p-3 bg-white/5 rounded-full group-hover:bg-pink-500/10 border border-white/10 group-hover:border-pink-500/50 transition-all"><Instagram size={24} /></div>
+            {/* SOCIALS - ALWAYS RENDERED NOW */}
+            <div className="flex gap-6 text-slate-400 justify-center">
+               <a href={profile.socials.github || "#"} target="_blank" rel="noreferrer" className="hover:text-white hover:scale-110 transition-all flex flex-col items-center gap-1 group">
+                  <div className="p-3 bg-white/5 rounded-full group-hover:bg-white/10 border border-white/10 group-hover:border-white/50 transition-all"><Github size={24} /></div>
+               </a>
+               
+               <a href={profile.socials.linkedin || "#"} target="_blank" rel="noreferrer" className="hover:text-blue-400 hover:scale-110 transition-all flex flex-col items-center gap-1 group">
+                  <div className="p-3 bg-white/5 rounded-full group-hover:bg-blue-500/10 border border-white/10 group-hover:border-blue-500/50 transition-all"><Linkedin size={24} /></div>
+               </a>
+
+               <a href={profile.socials.instagram || "#"} target="_blank" rel="noreferrer" className="hover:text-pink-500 hover:scale-110 transition-all flex flex-col items-center gap-1 group">
+                  <div className="p-3 bg-white/5 rounded-full group-hover:bg-pink-500/10 border border-white/10 group-hover:border-pink-500/50 transition-all"><Instagram size={24} /></div>
+               </a>
+
+               {/* NEW EXTRA LINK (Only shows if added in dashboard) */}
+               {profile.socials.other && (
+                   <a href={profile.socials.other} target="_blank" rel="noreferrer" className="hover:text-green-400 hover:scale-110 transition-all flex flex-col items-center gap-1 group">
+                      <div className="p-3 bg-white/5 rounded-full group-hover:bg-green-500/10 border border-white/10 group-hover:border-green-500/50 transition-all"><Globe size={24} /></div>
                    </a>
                )}
             </div>
