@@ -11,6 +11,7 @@ const app = express();
 
 app.use(cors({
   origin: (origin, callback) => {
+    // Allowed origins: Localhost and your Vercel deployment
     if (!origin || origin.includes('localhost') || origin.includes('.vercel.app')) {
       callback(null, true);
     } else {
@@ -30,8 +31,10 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/projects', require('./routes/projects'));
 app.use('/api/v1/contact', require('./routes/contact'));
-// --- NEW ROUTE ---
 app.use('/api/v1/content', require('./routes/content'));
+
+// --- NEW PROFILE ROUTE ---
+app.use('/api/v1/profile', require('./routes/profile'));
 
 app.use(errorHandler);
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
