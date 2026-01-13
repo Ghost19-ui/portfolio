@@ -32,6 +32,8 @@ app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/projects', require('./routes/projects'));
 app.use('/api/v1/contact', require('./routes/contact'));
 app.use('/api/v1/content', require('./routes/content'));
+app.use('/api/v1/certificates', require('./routes/certificates'));
+app.use('/api/v1/blogs', require('./routes/blogs'));
 
 // --- NEW PROFILE ROUTE ---
 app.use('/api/v1/profile', require('./routes/profile'));
