@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import HoloCard from '../components/HoloCard';
-import { Shield, Terminal, Download, Github, Linkedin, Instagram, Globe } from 'lucide-react';
+import { Shield, Terminal, Download, Github, Linkedin, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import API from '../api/axiosConfig';
 
 const Home = () => {
-  // Default State with YOUR ACTUAL LINKS (So they show up immediately)
+  // Default State (Fallback Data) to prevent blank screen
   const [profile, setProfile] = useState({
     name: "TUSHAR SAINI",
     role: "Red Team Operator",
-    bio: "Specializing in Network Intrusion, Web App Security, and Exploit Development. I don't just find bugs; I demonstrate the risk.",
-    skills: ["Python", "C++", "Kali Linux", "Burp Suite", "Metasploit", "Bash", "OWASP"],
+    bio: "Specializing in Network Intrusion, Web App Security, and Exploit Development.",
+    skills: ["Python", "Kali Linux", "Burp Suite"],
     socials: {
         github: "https://github.com/Ghost19-ui",
         linkedin: "https://www.linkedin.com/in/tushar-kumar-saini-4138a72b2/",
-        instagram: "https://www.instagram.com/tushar_saini___19/",
-        other: "" // Empty by default until you add it in dashboard
+        instagram: "https://www.instagram.com/tushar_saini___19/"
     }
   });
 
@@ -23,20 +22,17 @@ const Home = () => {
     const fetchProfile = async () => {
         try {
             const { data } = await API.get('/profile');
-            if(data) {
-                // Merge with defaults to prevent missing keys
-                setProfile(prev => ({
-                    ...prev,
-                    ...data,
-                    socials: { ...prev.socials, ...data.socials }
-                }));
-            }
+            // Only update if data exists, otherwise keep fallback
+            if(data) setProfile(data); 
         } catch (error) {
             console.log("Using default profile (API not connected)");
         }
     };
     fetchProfile();
   }, []);
+
+  // SAFE GUARD: If profile somehow becomes null, show loading or fallback
+  if (!profile) return <div className="min-h-screen flex items-center justify-center text-red-500">Loading Interface...</div>;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 pt-24 pb-12 relative z-10">
@@ -49,28 +45,28 @@ const Home = () => {
             <div className="relative group">
                <div className="absolute -inset-0.5 rounded-full bg-red-600 opacity-50 blur-md group-hover:opacity-100 transition-all duration-500 animate-pulse"></div>
                <div className="relative w-40 h-40 rounded-full p-1 bg-black border-2 border-red-500/80 shadow-[0_0_20px_rgba(220,38,38,0.5)] overflow-hidden">
-                  <img src="/profile.jpeg" alt={profile.name} className="w-full h-full object-cover rounded-full hover:scale-110 transition-transform duration-500" />
+                  <img src="/profile.jpeg" alt={profile?.name || "Operator"} className="w-full h-full object-cover rounded-full hover:scale-110 transition-transform duration-500" />
                </div>
                <div className="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-black animate-pulse" title="Status: Online"></div>
             </div>
 
-            {/* NAME & ROLE */}
+            {/* NAME & ROLE (Safe Access) */}
             <div className="space-y-2">
                <h1 className="text-4xl md:text-5xl font-bold font-mono text-white tracking-tighter uppercase">
-                  {profile.name}
+                  {profile?.name || "TUSHAR SAINI"}
                </h1>
                <div className="flex items-center justify-center gap-2 text-red-400 font-mono text-sm tracking-[0.2em] uppercase bg-red-950/30 py-1 px-3 rounded border border-red-900/50 inline-block">
-                  <Shield size={14} className="inline" /> {profile.role}
+                  <Shield size={14} className="inline" /> {profile?.role || "Red Team Operator"}
                </div>
             </div>
 
-            {/* BIO & SKILLS */}
+            {/* BIO & SKILLS (Safe Access) */}
             <div className="w-full border-t border-b border-red-900/30 py-6 my-2 bg-white/5">
                <p className="text-slate-200 font-mono text-base md:text-lg leading-relaxed max-w-md mx-auto px-4 mb-4 whitespace-pre-line">
-                  {profile.bio}
+                  {profile?.bio || "System Online."}
                </p>
                <div className="flex flex-wrap justify-center gap-2 max-w-md mx-auto px-2">
-                  {profile.skills.map((skill, index) => (
+                  {profile?.skills?.map((skill, index) => (
                      <span key={index} className="text-[10px] uppercase font-bold font-mono text-red-300 bg-red-950/40 border border-red-900/60 px-2 py-1 rounded hover:border-red-500 hover:text-white transition-colors cursor-default">
                         {skill}
                      </span>
@@ -78,24 +74,21 @@ const Home = () => {
                </div>
             </div>
 
-            {/* SOCIALS - ALWAYS RENDERED NOW */}
-            <div className="flex gap-6 text-slate-400 justify-center">
-               <a href={profile.socials.github || "#"} target="_blank" rel="noreferrer" className="hover:text-white hover:scale-110 transition-all flex flex-col items-center gap-1 group">
-                  <div className="p-3 bg-white/5 rounded-full group-hover:bg-white/10 border border-white/10 group-hover:border-white/50 transition-all"><Github size={24} /></div>
-               </a>
-               
-               <a href={profile.socials.linkedin || "#"} target="_blank" rel="noreferrer" className="hover:text-blue-400 hover:scale-110 transition-all flex flex-col items-center gap-1 group">
-                  <div className="p-3 bg-white/5 rounded-full group-hover:bg-blue-500/10 border border-white/10 group-hover:border-blue-500/50 transition-all"><Linkedin size={24} /></div>
-               </a>
-
-               <a href={profile.socials.instagram || "#"} target="_blank" rel="noreferrer" className="hover:text-pink-500 hover:scale-110 transition-all flex flex-col items-center gap-1 group">
-                  <div className="p-3 bg-white/5 rounded-full group-hover:bg-pink-500/10 border border-white/10 group-hover:border-pink-500/50 transition-all"><Instagram size={24} /></div>
-               </a>
-
-               {/* NEW EXTRA LINK (Only shows if added in dashboard) */}
-               {profile.socials.other && (
-                   <a href={profile.socials.other} target="_blank" rel="noreferrer" className="hover:text-green-400 hover:scale-110 transition-all flex flex-col items-center gap-1 group">
-                      <div className="p-3 bg-white/5 rounded-full group-hover:bg-green-500/10 border border-white/10 group-hover:border-green-500/50 transition-all"><Globe size={24} /></div>
+            {/* SOCIALS (Safe Access with ?.) */}
+            <div className="flex gap-6 text-slate-400">
+               {profile?.socials?.github && (
+                   <a href={profile.socials.github} target="_blank" rel="noreferrer" className="hover:text-white hover:scale-110 transition-all flex flex-col items-center gap-1 group">
+                      <div className="p-3 bg-white/5 rounded-full group-hover:bg-white/10 border border-white/10 group-hover:border-white/50 transition-all"><Github size={24} /></div>
+                   </a>
+               )}
+               {profile?.socials?.linkedin && (
+                   <a href={profile.socials.linkedin} target="_blank" rel="noreferrer" className="hover:text-blue-400 hover:scale-110 transition-all flex flex-col items-center gap-1 group">
+                      <div className="p-3 bg-white/5 rounded-full group-hover:bg-blue-500/10 border border-white/10 group-hover:border-blue-500/50 transition-all"><Linkedin size={24} /></div>
+                   </a>
+               )}
+               {profile?.socials?.instagram && (
+                   <a href={profile.socials.instagram} target="_blank" rel="noreferrer" className="hover:text-pink-500 hover:scale-110 transition-all flex flex-col items-center gap-1 group">
+                      <div className="p-3 bg-white/5 rounded-full group-hover:bg-pink-500/10 border border-white/10 group-hover:border-pink-500/50 transition-all"><Instagram size={24} /></div>
                    </a>
                )}
             </div>
