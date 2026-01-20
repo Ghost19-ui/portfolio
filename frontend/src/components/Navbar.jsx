@@ -11,7 +11,7 @@ const Navbar = () => {
   const navLinks = [
     { name: 'HOME', path: '/', icon: <User size={14} /> },
     { name: 'PROJECTS', path: '/projects', icon: <Terminal size={14} /> },
-    { name: 'CERTIFICATIONS', path: '/certifications', icon: <Award size={14} /> }, // NEW LINK ADDED HERE
+    { name: 'CERTIFICATIONS', path: '/certifications', icon: <Award size={14} /> }, // NEW LINK
     { name: 'BLOG', path: '/blog', icon: <FileText size={14} /> },
     { name: 'CONTACT', path: '/contact', icon: <Mail size={14} /> },
   ];
