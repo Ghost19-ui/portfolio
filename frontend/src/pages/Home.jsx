@@ -176,7 +176,7 @@ const Home = () => {
          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {certificates.map((cert) => (
                <motion.div key={cert._id} whileHover={{ y: -5 }} className="relative h-64 bg-gradient-to-br from-neutral-900 to-black border border-white/10 rounded-xl p-6 flex flex-col justify-between overflow-hidden group cursor-pointer">
-                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none"/>
+                 
                  <div className="absolute inset-0 bg-gradient-to-tr from-cyber-red/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"/>
                  
                  <div className="flex justify-between relative z-10">
