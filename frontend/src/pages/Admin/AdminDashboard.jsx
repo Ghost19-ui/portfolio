@@ -72,21 +72,21 @@ const AdminDashboard = () => {
         const url = await handleFileUpload(acceptedFiles[0], 'resume');
         if(url) setProfileData(prev => ({ ...prev, resumeUrl: url }));
      }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); 
 
   const onDropProjectImg = useCallback(async (acceptedFiles) => {
      if(acceptedFiles?.length > 0) {
         const url = await handleFileUpload(acceptedFiles[0], 'projectImage');
         if(url) setProjectData(prev => ({ ...prev, imageUrl: url }));
      }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); 
 
   const onDropCertFile = useCallback(async (acceptedFiles) => {
     if(acceptedFiles?.length > 0) {
         const url = await handleFileUpload(acceptedFiles[0], 'certFile');
         if(url) setCertData(prev => ({ ...prev, certUrl: url }));
     }
- }, []); // eslint-disable-line react-hooks/exhaustive-deps
+ }, []); 
 
 
   // --- DATA SAVE HANDLERS ---
