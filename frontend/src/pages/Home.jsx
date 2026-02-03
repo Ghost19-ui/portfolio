@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../api/axios"; 
-import { Terminal, Github, Linkedin, Instagram, ExternalLink, Shield, Cpu, Lock, Mail, Phone, X, FileText, ArrowRightCircle } from "lucide-react";
+import { Terminal, Github, Linkedin, Instagram, Mail, X, FileText } from "lucide-react";
 import NeuralBackground from "../components/NeuralBackground";
 
 // --- FALLBACK DATA (SAFETY NET) ---
@@ -28,7 +28,6 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const res = await API.get('/data/all-public-data');
-        // LOGIC: If database is empty, use DEMO_DATA
         if (!res.data || !res.data.profile || !res.data.profile.name) {
             console.warn("Database empty. Loading Safety Net Protocol.");
             setData(DEMO_DATA);
@@ -52,7 +51,7 @@ const Home = () => {
     </div>
   );
 
-  const { profile, projects, certificates } = data;
+  const { profile } = data;
 
   return (
     <div className="min-h-screen bg-black text-white font-mono selection:bg-red-900 selection:text-white relative overflow-x-hidden">
@@ -130,8 +129,6 @@ const Home = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      
-      {/* Note: Other sections (Projects/Contact) will be handled by their own components */}
     </div>
   );
 };
