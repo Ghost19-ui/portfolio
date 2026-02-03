@@ -17,12 +17,14 @@ connectDB().catch(err => {
 const app = express();
 
 // 4. Middlewares
+const cors = require('cors');
+
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://portfolio-cgpo.vercel.app",
-    "https://portfolio-seven-black-as1rtezo05.vercel.app", // 👈 THIS IS THE FIX (From your error)
-    "https://portfolio-git-main-tushar-sainis-projects-71462a97.vercel.app"
+    "https://portfolio-cgpo.vercel.app", 
+    "https://portfolio-seven-black-as1rtezo05.vercel.app", // 👈 THIS IS MISSING IN YOUR CODE
+    "https://portfolio-git-main-tushar-sainis-projects-71462a97.vercel.app" 
   ],
   credentials: true
 }));
