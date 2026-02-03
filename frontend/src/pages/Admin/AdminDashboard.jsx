@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import API from '../api/axios'; 
+// FIX: Added extra '../' to reach the api folder from the Admin subfolder
+import API from '../../api/axios'; 
 import { Upload, Loader, LogOut, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast'; 
