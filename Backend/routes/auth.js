@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User'); // Pointing to your specific file
-const { protect } = require('../middleware/auth');
+const { protect } = require('../middleware/authMiddleware');
 
 // @desc    Login User
 // @route   POST /api/auth/login

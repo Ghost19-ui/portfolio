@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import API from '../api/axiosConfig';
+import API from '../api/axios';
 import HoloCard from '../components/HoloCard';
 import { Send, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
 

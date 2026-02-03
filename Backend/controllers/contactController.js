@@ -1,12 +1,13 @@
 const Contact = require('../models/Contact');
 
+// @desc    Submit new contact message
+// @route   POST /api/contact
 exports.submitContact = async (req, res, next) => {
   try {
     const { name, email, phone, subject, message } = req.body;
 
-    // Validation
-    if (!name || !email || !subject || !message) {
-      const err = new Error('Please provide all required fields');
+    if (!name || !email || !message) {
+      const err = new Error('Please provide name, email, and message');
       err.status = 400;
       return next(err);
     }
@@ -15,52 +16,32 @@ exports.submitContact = async (req, res, next) => {
       name,
       email,
       phone,
-      subject,
+      subject: subject || 'No Subject',
       message,
       ipAddress: req.ip,
       userAgent: req.get('user-agent'),
     });
 
-    res.status(201).json({
-      success: true,
-      message: 'Message received successfully',
-      data: contact,
-    });
+    res.status(201).json(contact); // Return raw object
   } catch (error) {
     next(error);
   }
 };
 
+// @desc    Get all messages (Admin)
+// @route   GET /api/admin/messages
 exports.getMessages = async (req, res, next) => {
   try {
     const messages = await Contact.find().sort({ createdAt: -1 });
-    res.json({
-      success: true,
-      count: messages.length,
-      data: messages,
-    });
+    // --- FIX: Return RAW ARRAY ---
+    res.status(200).json(messages); 
   } catch (error) {
     next(error);
   }
 };
 
-exports.getMessageById = async (req, res, next) => {
-  try {
-    const message = await Contact.findById(req.params.id);
-    if (!message) {
-      const err = new Error('Message not found');
-      err.status = 404;
-      return next(err);
-    }
-    res.json({
-      success: true,
-      data: message,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
+// @desc    Delete message
+// @route   DELETE /api/admin/messages/:id
 exports.deleteMessage = async (req, res, next) => {
   try {
     const message = await Contact.findByIdAndDelete(req.params.id);
@@ -69,37 +50,7 @@ exports.deleteMessage = async (req, res, next) => {
       err.status = 404;
       return next(err);
     }
-    res.json({
-      success: true,
-      message: 'Message deleted successfully',
-      data: message,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.updateMessageStatus = async (req, res, next) => {
-  try {
-    const { status, adminNotes } = req.body;
-
-    const message = await Contact.findByIdAndUpdate(
-      req.params.id,
-      { status, adminNotes },
-      { new: true, runValidators: true }
-    );
-
-    if (!message) {
-      const err = new Error('Message not found');
-      err.status = 404;
-      return next(err);
-    }
-
-    res.json({
-      success: true,
-      message: 'Message updated successfully',
-      data: message,
-    });
+    res.status(200).json({ message: 'Message deleted' });
   } catch (error) {
     next(error);
   }

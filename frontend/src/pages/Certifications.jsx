@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import API from '../api/axiosConfig';
+import API from '../api/axios';
 import GlareCard from '../components/GlareCard';
 import { 
   Search, Filter, X, ExternalLink, Shield, FileText, 

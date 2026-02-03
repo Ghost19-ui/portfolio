@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import API from '../api/axiosConfig';
+import API from '../api/axios';
 import CyberGlobe from '../components/CyberGlobe'; // <--- UPDATED IMPORT
 import { Loader2, Calendar, Tag } from 'lucide-react';
 

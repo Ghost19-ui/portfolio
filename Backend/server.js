@@ -8,37 +8,46 @@ const path = require('path');
 dotenv.config();
 
 // 2. Connect to MongoDB Atlas
-connectDB();
+connectDB().catch(err => {
+  console.error("Database connection failed", err);
+  process.exit(1);
+});
 
 // 3. Initialize Express
 const app = express();
 
 // 4. Middlewares
-app.use(cors()); // Enable CORS for frontend communication
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(cors({
+  origin: ["http://localhost:3000", "https://portfolio-cgpo.vercel.app"], // Your Vercel Frontend
+  credentials: true
+}));
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
 
 // 5. Routes
-// Auth Route (Login/Register)
 app.use('/api/auth', require('./routes/auth'));
-
-// Upload Route (PDFs & Images via Cloudinary)
+app.use('/api/admin', require('./routes/admin')); 
 app.use('/api/upload', require('./routes/upload'));
 
-// Data Route (Profile, Projects, Certificates)
+// --- CRITICAL FIX: Support both frontend path styles ---
+// For Home Page (calls /api/data/...)
 app.use('/api/data', require('./routes/api'));
+// For Projects/Certs Pages (calls /api/projects)
+app.use('/api', require('./routes/api')); 
 
-// 6. Test Route (To check if server is alive)
+// 6. Test Route
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// 7. Start Server
+// 7. Start Server (Conditional for Vercel)
 const PORT = process.env.PORT || 5000;
+// Only listen if NOT in production (Vercel handles this automatically)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-// Export the app for Vercel
+// Export for Vercel
 module.exports = app;

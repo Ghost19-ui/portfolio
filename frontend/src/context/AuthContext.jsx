@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+// Import the custom Axios instance you just shared
+import API from '../api/axios'; 
 
 export const AuthContext = createContext();
 
@@ -11,31 +12,56 @@ export const AuthProvider = ({ children }) => {
     checkUserLoggedIn();
   }, []);
 
+  // Check if a user is already logged in when the app starts
   const checkUserLoggedIn = async () => {
     const token = localStorage.getItem('token');
+    
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       try {
-        const { data } = await axios.get('http://localhost:5000/api/auth/me');
-        setUser(data.data);
+        // We use API.get() so it automatically attaches the token from localStorage
+        // This assumes your backend has a GET /api/auth/me route
+        const { data } = await API.get('/auth/me');
+        setUser(data.data || data.user); 
       } catch (err) {
+        // If the token is invalid or expired, clear it
+        console.error("Session expired:", err);
         localStorage.removeItem('token');
+        setUser(null);
       }
     }
     setLoading(false);
   };
 
+  // Login function
   const login = async (email, password) => {
-    const { data } = await axios.post('http://localhost:5000/api/auth/login', { email, password });
-    localStorage.setItem('token', data.token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-    await checkUserLoggedIn();
+    try {
+      // Calls POST /api/auth/login
+      const { data } = await API.post('/auth/login', { email, password });
+      
+      // Save token
+      localStorage.setItem('token', data.token);
+      
+      // If the backend returns the user object directly, use it
+      if (data.user) {
+        setUser(data.user);
+      } else {
+        // Otherwise, fetch user details
+        await checkUserLoggedIn();
+      }
+      return true; // Login success
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw error; // Let the Login component handle the error message
+    }
   };
 
+  // Logout function
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('admin'); 
     setUser(null);
-    delete axios.defaults.headers.common['Authorization'];
+    // We don't need to delete headers manually because the API interceptor 
+    // checks localStorage every time a request is made.
   };
 
   return (
