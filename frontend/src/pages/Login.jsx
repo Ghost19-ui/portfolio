@@ -1,15 +1,15 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Lock, ShieldAlert } from 'lucide-react';
-import { motion } from 'framer-motion'; // For shake animation
+import { Lock } from 'lucide-react'; // REMOVED Unused Icons
+import { motion } from 'framer-motion'; 
 import NeuralBackground from '../components/NeuralBackground';
 
 const Login = () => {
-  const [email, setEmail] = useState(''); // SECURE: Starts empty
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [shake, setShake] = useState(false); // For animation
+  const [shake, setShake] = useState(false); 
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ const Login = () => {
     } catch (err) {
       setError('ACCESS_DENIED: Invalid Credentials');
       setShake(true);
-      setTimeout(() => setShake(false), 500); // Reset shake
+      setTimeout(() => setShake(false), 500);
     }
   };
 
@@ -44,8 +44,7 @@ const Login = () => {
         <p className="text-center text-gray-500 text-xs mb-8 uppercase tracking-widest">Authorized Personnel Only</p>
 
         {error && (
-          <div className="bg-red-950/50 border-l-4 border-red-600 p-3 mb-6 flex items-center gap-3">
-             <ShieldAlert size={18} className="text-red-500" />
+          <div className="bg-red-950/50 border-l-4 border-red-600 p-3 mb-6">
              <span className="text-xs font-mono text-red-400">{error}</span>
           </div>
         )}
@@ -57,7 +56,7 @@ const Login = () => {
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-black border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all font-mono"
+              className="w-full bg-black border border-white/10 rounded-lg py-3 px-4 text-white focus:border-red-600 outline-none font-mono"
               placeholder="Enter Email"
               required
             />
@@ -69,7 +68,7 @@ const Login = () => {
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all font-mono"
+              className="w-full bg-black border border-white/10 rounded-lg py-3 px-4 text-white focus:border-red-600 outline-none font-mono"
               placeholder="••••••••"
               required
             />
@@ -77,7 +76,7 @@ const Login = () => {
 
           <button 
             type="submit" 
-            className="w-full bg-red-600 text-black font-bold py-3 rounded-lg hover:bg-white transition-all uppercase tracking-widest shadow-[0_0_15px_rgba(220,38,38,0.4)]"
+            className="w-full bg-red-600 text-black font-bold py-3 rounded-lg hover:bg-white transition-all uppercase tracking-widest"
           >
             AUTHENTICATE
           </button>
