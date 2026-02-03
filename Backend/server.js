@@ -20,7 +20,8 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://portfolio-seven-black-as1rtezo05.vercel.app", // 👈 THIS is your actual Frontend URL
+    "https://portfolio-cgpo.vercel.app",
+    "https://portfolio-seven-black-as1rtezo05.vercel.app", // 👈 THIS IS THE FIX (From your error)
     "https://portfolio-git-main-tushar-sainis-projects-71462a97.vercel.app"
   ],
   credentials: true
