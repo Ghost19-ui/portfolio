@@ -1,6 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const cors = require('cors');
+const cors = require('cors'); // Declared ONLY once here
 const connectDB = require('./config/db');
 const path = require('path');
 
@@ -17,17 +17,12 @@ connectDB().catch(err => {
 const app = express();
 
 // 4. Middlewares
-const cors = require('cors');
-
-const cors = require('cors');
-
-// ... imports
-
-// REPLACE THE OLD CORS BLOCK WITH THIS:
+// "origin: true" allows any domain to connect (Universal Fix)
 app.use(cors({
-  origin: true,  // 👈 This allows ALL your Vercel URLs automatically
+  origin: true, 
   credentials: true
 }));
+
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 
@@ -36,7 +31,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin')); 
 app.use('/api/upload', require('./routes/upload'));
 
-// --- CRITICAL FIX: Support both frontend path styles ---
+// --- Support both frontend path styles ---
 // For Home Page (calls /api/data/...)
 app.use('/api/data', require('./routes/api'));
 // For Projects/Certs Pages (calls /api/projects)
@@ -47,7 +42,7 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// 7. Start Server (Conditional for Vercel)
+// 7. Start Server
 const PORT = process.env.PORT || 5000;
 // Only listen if NOT in production (Vercel handles this automatically)
 if (process.env.NODE_ENV !== 'production') {
