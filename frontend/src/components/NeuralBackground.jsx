@@ -7,7 +7,7 @@ const NeuralBackground = () => {
       {/* 1. CSS-based Gradient (No image file needed) */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#000000_100%)] z-10" />
       
-      {/* 2. CSS-based Noise Texture */}
+      {/* 2. CSS-based Noise Texture (Replaces the missing .png file) */}
       <div 
         className="absolute inset-0 opacity-[0.03] z-0 mix-blend-overlay"
         style={{ 
