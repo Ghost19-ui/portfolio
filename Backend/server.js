@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 
 // 3. CORS Middleware (The Gatekeeper) - MUST BE FIRST
-// This ensures headers are sent even if DB fails
+// This ensures headers are sent even if DB fails or is slow
 app.use(cors({
   origin: [
     "http://localhost:3000",
