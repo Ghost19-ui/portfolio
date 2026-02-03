@@ -18,7 +18,11 @@ const app = express();
 
 // 4. Middlewares
 app.use(cors({
-  origin: ["http://localhost:3000", "https://portfolio-cgpo.vercel.app"], // Your Vercel Frontend
+  origin: [
+    "http://localhost:3000",
+    "https://portfolio-seven-black-as1rtezo05.vercel.app", // 👈 THIS is your actual Frontend URL
+    "https://portfolio-git-main-tushar-sainis-projects-71462a97.vercel.app"
+  ],
   credentials: true
 }));
 app.use(express.json()); 
