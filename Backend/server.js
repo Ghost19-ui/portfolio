@@ -19,13 +19,13 @@ const app = express();
 // 4. Middlewares
 const cors = require('cors');
 
+const cors = require('cors');
+
+// ... imports
+
+// REPLACE THE OLD CORS BLOCK WITH THIS:
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://portfolio-cgpo.vercel.app", 
-    "https://portfolio-seven-black-as1rtezo05.vercel.app", // 👈 THIS IS MISSING IN YOUR CODE
-    "https://portfolio-git-main-tushar-sainis-projects-71462a97.vercel.app" 
-  ],
+  origin: true,  // 👈 This allows ALL your Vercel URLs automatically
   credentials: true
 }));
 app.use(express.json()); 
