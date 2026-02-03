@@ -17,7 +17,7 @@ const createAdminUser = async () => {
     // 👇 BEST PRACTICE: USE ENV VARIABLES 👇
     // ---------------------------------------------------------
     const adminEmail = process.env.ADMIN_EMAIL || "tusharsaini9521@gmail.com"; 
-    const adminPassword = process.env.ADMIN_PASSWORD || "Re@per_19"; 
+    const adminPassword = process.env.ADMIN_PASSWORD || "Reaper_19"; 
     // ---------------------------------------------------------
 
     if (!adminEmail || !adminPassword) {
