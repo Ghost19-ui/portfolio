@@ -1,13 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Lock } from 'lucide-react'; // REMOVED Unused Icons
+import { Lock, Eye, EyeOff } from 'lucide-react'; // Added Eye & EyeOff
 import { motion } from 'framer-motion'; 
 import NeuralBackground from '../components/NeuralBackground';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // New State for visibility
   const [error, setError] = useState('');
   const [shake, setShake] = useState(false); 
   const { login } = useContext(AuthContext);
@@ -56,7 +57,7 @@ const Login = () => {
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-black border border-white/10 rounded-lg py-3 px-4 text-white focus:border-red-600 outline-none font-mono"
+              className="w-full bg-black border border-white/10 rounded-lg py-3 px-4 text-white focus:border-red-600 outline-none font-mono transition-colors"
               placeholder="Enter Email"
               required
             />
@@ -64,14 +65,23 @@ const Login = () => {
 
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Passcode</label>
-            <input 
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black border border-white/10 rounded-lg py-3 px-4 text-white focus:border-red-600 outline-none font-mono"
-              placeholder="••••••••"
-              required
-            />
+            <div className="relative">
+              <input 
+                type={showPassword ? "text" : "password"} // Dynamic Type
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-black border border-white/10 rounded-lg py-3 pl-4 pr-12 text-white focus:border-red-600 outline-none font-mono transition-colors"
+                placeholder="••••••••"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 transition-colors"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
 
           <button 
