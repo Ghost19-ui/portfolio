@@ -32,6 +32,8 @@ const UserSchema = new mongoose.Schema({
   bio: String,
   github: String,
   linkedin: String,
+  instagram: String,
+  phone: String,
   resumeUrl: String,
   createdAt: {
     type: Date,

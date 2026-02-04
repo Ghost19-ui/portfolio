@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-// FIX: Added extra '../' to reach the api folder from the Admin subfolder
+// Ensure this path correctly points to your axios instance
 import API from '../../api/axios'; 
 import { Upload, Loader, LogOut, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -48,8 +48,27 @@ const AdminDashboard = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   // --- FORM STATES ---
-  const [profileData, setProfileData] = useState({ name: '', role: '', bio: '', email: '', github: '', linkedin: '', resumeUrl: '' });
-  const [projectData, setProjectData] = useState({ title: '', description: '', techStack: '', liveLink: '', imageUrl: '' });
+  const [profileData, setProfileData] = useState({ 
+    name: '', 
+    role: '', 
+    bio: '', 
+    email: '', 
+    phone: '',      // Added Field
+    github: '', 
+    linkedin: '', 
+    instagram: '',  // Added Field
+    resumeUrl: '' 
+  });
+
+  const [projectData, setProjectData] = useState({ 
+    title: '', 
+    description: '', 
+    techStack: '', 
+    liveLink: '',
+    repoLink: '',   // Added Field
+    imageUrl: '' 
+  });
+
   const [certData, setCertData] = useState({ title: '', issuer: '', issueDate: '', certUrl: '' });
 
   // --- INITIAL DATA FETCH ---
@@ -57,7 +76,10 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const res = await API.get('/data/all-public-data');
-        if(res.data.profile) setProfileData(res.data.profile);
+        if(res.data.profile) {
+            // Merge existing profile data to ensure all fields are populated
+            setProfileData(prev => ({ ...prev, ...res.data.profile }));
+        }
       } catch(err) {
         toast.error("Failed to load dashboard data");
       }
@@ -104,9 +126,9 @@ const AdminDashboard = () => {
     setIsSaving(true);
     try {
         const payload = { ...projectData, techStack: projectData.techStack.split(',').map(s => s.trim()) };
-        await API.post('/admin/projects', payload);
+        await API.post('/admin/project', payload); // Ensure route is singular '/project'
         toast.success("Project Deployed!");
-        setProjectData({ title: '', description: '', techStack: '', liveLink: '', imageUrl: '' }); // Reset form
+        setProjectData({ title: '', description: '', techStack: '', liveLink: '', repoLink: '', imageUrl: '' }); // Reset form
     } catch(err) {
         toast.error("Deployment Failed.");
     } finally {
@@ -117,7 +139,7 @@ const AdminDashboard = () => {
   const saveCert = async () => {
     setIsSaving(true);
     try {
-        await API.post('/admin/certificates', certData);
+        await API.post('/admin/certificate', certData); // Ensure route is singular '/certificate'
         toast.success("Certificate Archived!");
         setCertData({ title: '', issuer: '', issueDate: '', certUrl: '' });
     } catch(err) {
@@ -133,7 +155,7 @@ const AdminDashboard = () => {
       <Toaster position="bottom-right" toastOptions={{ style: { background: '#333', color: '#fff', border: '1px solid #DC2626' } }} />
 
       {/* --- SIDEBAR --- */}
-      <aside className="w-64 bg-black border-r border-white/5 p-6 flex flex-col">
+      <aside className="w-64 bg-black border-r border-white/5 p-6 flex flex-col hidden md:flex">
         <div className="text-red-600 font-bold tracking-widest text-xl mb-12 flex items-center gap-2">
             <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse"/> ADMIN_PANEL
         </div>
@@ -178,8 +200,10 @@ const AdminDashboard = () => {
                 <div>
                     <h3 className="text-xl text-white mb-6 font-mono border-b border-white/10 pb-2">SOCIAL & RESUME</h3>
                     <InputField label="Email" value={profileData.email} onChange={e => setProfileData({...profileData, email: e.target.value})} />
-                    <InputField label="GitHub URL" value={profileData.github} onChange={e => setProfileData({...profileData, github: e.target.value})} />
-                    <InputField label="LinkedIn URL" value={profileData.linkedin} onChange={e => setProfileData({...profileData, linkedin: e.target.value})} />
+                    <InputField label="Phone Number" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} placeholder="+91 98765 43210"/>
+                    <InputField label="GitHub URL" value={profileData.github} onChange={e => setProfileData({...profileData, github: e.target.value})} placeholder="https://github.com/yourusername"/>
+                    <InputField label="LinkedIn URL" value={profileData.linkedin} onChange={e => setProfileData({...profileData, linkedin: e.target.value})} placeholder="https://linkedin.com/in/yourprofile"/>
+                    <InputField label="Instagram URL" value={profileData.instagram} onChange={e => setProfileData({...profileData, instagram: e.target.value})} placeholder="https://instagram.com/yourhandle"/>
                     
                     <div className="mt-6">
                         <UploadBox dropzoneHook={resumeDrop} label="UPLOAD RESUME PDF" currentUrl={profileData.resumeUrl} isPdf={true} />
@@ -199,7 +223,10 @@ const AdminDashboard = () => {
                         <textarea value={projectData.description} onChange={e => setProjectData({...projectData, description: e.target.value})} className="w-full bg-black border border-white/10 p-3 text-sm font-mono text-white h-32"/>
                     </div>
                     <InputField label="Tech Stack (Comma Separated)" value={projectData.techStack} onChange={e => setProjectData({...projectData, techStack: e.target.value})} placeholder="e.g. Python, React, Kali Linux" />
-                    <InputField label="Live Link URL" value={projectData.liveLink} onChange={e => setProjectData({...projectData, liveLink: e.target.value})} />
+                    
+                    {/* LINKS SECTION */}
+                    <InputField label="Live Demo URL" value={projectData.liveLink} onChange={e => setProjectData({...projectData, liveLink: e.target.value})} placeholder="https://your-demo-site.com" />
+                    <InputField label="Repository URL (GitHub)" value={projectData.repoLink} onChange={e => setProjectData({...projectData, repoLink: e.target.value})} placeholder="https://github.com/yourusername/repo" />
                     
                     <button onClick={saveProject} disabled={isSaving} className="mt-4 w-full bg-red-600 text-black font-bold py-3 rounded hover:bg-red-500 transition-all uppercase tracking-widest font-mono flex justify-center">
                         {isSaving ? <Loader className="animate-spin"/> : "SAVE PROJECT"}
