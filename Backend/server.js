@@ -1,15 +1,14 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const cors = require('cors'); // Make sure to npm install cors if needed
-const connectDB = require('./config/db');
+const cors = require('cors');
+const mongoose = require('mongoose'); // 👈 Import Mongoose directly here
 
 dotenv.config();
 
 // Initialize App
 const app = express();
 
-// Simple, Standard CORS
-// We allow credentials just in case, but the Proxy handles the heavy lifting now.
+// --- 1. PROXY/CORS SETUP ---
 app.use(cors({
   origin: true,
   credentials: true
@@ -18,15 +17,26 @@ app.use(cors({
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 
-// Connect to Database
-connectDB().then(() => console.log("MongoDB Connected"))
-           .catch(err => console.log(err));
+// --- 2. DATABASE CONNECTION (Moved Inside) ---
+const connectDB = async () => {
+  try {
+    // We use the variable from Vercel Settings
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    // Don't exit process in Vercel, just log it
+  }
+};
 
-// Routes
+// Connect immediately
+connectDB();
+
+// --- 3. ROUTES ---
+// (Ensure these require paths are correct. If these fail, we check folders next)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin')); 
 app.use('/api/upload', require('./routes/upload'));
-// Support standard /api route
 app.use('/api', require('./routes/api')); 
 
 app.get('/', (req, res) => res.send('Backend is running...'));
