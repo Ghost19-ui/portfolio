@@ -14,7 +14,18 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/Backend/server.js"
+      "methods": ["OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "https://portfolio-seven-black-as1rtez05.vercel.app, https://portfolio-git-main-tushar-sainis-projects-71462a97.vercel.app, https://portfolio-cgpo.vercel.app",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+        "Access-Control-Allow-Credentials": "true"
+      },
+      "continue": true
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "Backend/server.js"
     },
     {
       "src": "/(.*)",
