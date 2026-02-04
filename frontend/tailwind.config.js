@@ -1,22 +1,23 @@
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
   theme: {
     extend: {
       colors: {
         'cyber-black': '#050505',
-        'cyber-dark': '#0A0A0A',
-        'cyber-red': '#DC2626',
-        'cyber-text': '#E5E5E5',
-        'cyber-muted': '#737373',
+        'cyber-dark': '#0a0a0a',
+        'cyber-red': '#ff0f39', // The bright red color
+        'cyber-text': '#e0e0e0',
       },
       fontFamily: {
         mono: ['"JetBrains Mono"', 'monospace'],
-        sans: ['"Inter"', 'sans-serif'],
+        sans: ['"Rajdhani"', 'sans-serif'],
       },
       animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      },
+        'spin-slow': 'spin 12s linear infinite',
+      }
     },
   },
   plugins: [],
