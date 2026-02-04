@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // 👈 FIXED: Capital 'U'
+const User = require('../models/UserModel'); // 👈 LINKED TO NEW NAME
 const { protect } = require('../middleware/authMiddleware');
 
-// @route POST /api/auth/login
+// @desc    Login User
+// @route   POST /api/auth/login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -22,12 +23,13 @@ router.post('/login', async (req, res) => {
 
     res.status(200).json({ success: true, token });
   } catch (err) {
-    console.error(err); // Log the real error to console
+    console.error(err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// @route GET /api/auth/me
+// @desc    Get current logged in user
+// @route   GET /api/auth/me
 router.get('/me', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);

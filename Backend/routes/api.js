@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const User = require('../models/UserModel');
 const Project = require('../models/Project');
 const Certificate = require('../models/Certificate');
 const { submitContact } = require('../controllers/contactController');

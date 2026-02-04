@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // 👈 FIXED: Capital 'U'
+const User = require('../models/UserModel'); // 👈 LINKED TO NEW NAME
 
 exports.protect = async (req, res, next) => {
   let token;
