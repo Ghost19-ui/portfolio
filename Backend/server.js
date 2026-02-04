@@ -1,36 +1,47 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const cors = require('cors');
 const connectDB = require('./config/db');
 
 // 1. Load Environment Variables
 dotenv.config();
 
-// 2. Initialize Express FIRST (Before DB)
+// 2. Initialize Express
 const app = express();
 
-// 3. CORS Middleware (The Gatekeeper) - MUST BE FIRST
-// This ensures headers are sent even if DB fails or is slow
-app.use(cors({
-  origin: [
+// 3. MANUAL CORS MIDDLEWARE (The Fix)
+// We handle this manually to ensure Vercel never blocks the Preflight check
+app.use((req, res, next) => {
+  const allowedOrigins = [
     "http://localhost:3000",
     "https://portfolio-seven-black-as1rtezo05.vercel.app",
     "https://portfolio-git-main-tushar-sainis-projects-71462a97.vercel.app",
     "https://portfolio-cgpo.vercel.app"
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  credentials: true
-}));
+  ];
 
-// Handle Preflight requests explicitly
-app.options('*', cors());
+  const origin = req.headers.origin;
+
+  // If the origin is allowed, echo it back
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  // Always allow these methods and headers
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // Handle Preflight (OPTIONS) requests immediately with 200 OK
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 
-// 4. Connect to MongoDB Atlas (After middleware is set)
-// We remove the 'process.exit' so the server doesn't crash silently
+// 4. Connect to MongoDB (After middleware is ready)
 connectDB().then(() => {
     console.log("MongoDB Connected");
 }).catch(err => {
