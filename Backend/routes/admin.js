@@ -1,29 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
-const User = require('../models/UserModel');
+const User = require('../models/UserModel'); // 👈 FIXED IMPORT
 
 // Import Controllers
 const { createProject, deleteProject } = require('../controllers/projectController');
 const { createCertificate, deleteCertificate } = require('../controllers/certificateController');
 const { getMessages, deleteMessage } = require('../controllers/contactController');
 
-// --- PROJECTS ---
+// Projects
 router.post('/project', protect, createProject);
 router.delete('/project/:id', protect, deleteProject);
 
-// --- CERTIFICATES ---
+// Certificates
 router.post('/certificate', protect, createCertificate);
 router.delete('/certificate/:id', protect, deleteCertificate);
 
-// --- MESSAGES ---
+// Messages
 router.get('/messages', protect, getMessages);
 router.delete('/messages/:id', protect, deleteMessage);
 
-// --- PROFILE UPDATE (Bio, Skills, etc.) ---
+// Profile Update
 router.put('/profile', protect, async (req, res) => {
   try {
-    // We use findByIdAndUpdate to target the logged-in admin's ID
     const user = await User.findByIdAndUpdate(req.user.id, req.body, {
       new: true,
       runValidators: true
