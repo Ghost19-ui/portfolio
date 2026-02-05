@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-// Ensure this path correctly points to your axios instance
+// FIX: Ensure this path correctly points to your axios instance
 import API from '../../api/axios'; 
 import { Upload, Loader, LogOut, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -53,10 +53,10 @@ const AdminDashboard = () => {
     role: '', 
     bio: '', 
     email: '', 
-    phone: '',      // Added Field
+    phone: '',      // Added
     github: '', 
     linkedin: '', 
-    instagram: '',  // Added Field
+    instagram: '',  // Added
     resumeUrl: '' 
   });
 
@@ -65,7 +65,7 @@ const AdminDashboard = () => {
     description: '', 
     techStack: '', 
     liveLink: '',
-    repoLink: '',   // Added Field
+    repoLink: '',   // Added
     imageUrl: '' 
   });
 
@@ -125,10 +125,15 @@ const AdminDashboard = () => {
   const saveProject = async () => {
     setIsSaving(true);
     try {
-        const payload = { ...projectData, techStack: projectData.techStack.split(',').map(s => s.trim()) };
-        await API.post('/admin/project', payload); // Ensure route is singular '/project'
+        // Prepare payload: split tech stack string into array
+        const payload = { 
+            ...projectData, 
+            techStack: projectData.techStack.split(',').map(s => s.trim()) 
+        };
+        await API.post('/admin/project', payload); // Correct singular endpoint
         toast.success("Project Deployed!");
-        setProjectData({ title: '', description: '', techStack: '', liveLink: '', repoLink: '', imageUrl: '' }); // Reset form
+        // Reset form after successful save
+        setProjectData({ title: '', description: '', techStack: '', liveLink: '', repoLink: '', imageUrl: '' }); 
     } catch(err) {
         toast.error("Deployment Failed.");
     } finally {
@@ -139,8 +144,9 @@ const AdminDashboard = () => {
   const saveCert = async () => {
     setIsSaving(true);
     try {
-        await API.post('/admin/certificate', certData); // Ensure route is singular '/certificate'
+        await API.post('/admin/certificate', certData); // Correct singular endpoint
         toast.success("Certificate Archived!");
+        // Reset form after successful save
         setCertData({ title: '', issuer: '', issueDate: '', certUrl: '' });
     } catch(err) {
         toast.error("Archive Failed.");
@@ -150,33 +156,33 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white font-sans flex">
+    <div className="min-h-screen bg-neutral-950 text-white font-sans flex flex-col md:flex-row">
       {/* Toast Notification Wrapper */}
       <Toaster position="bottom-right" toastOptions={{ style: { background: '#333', color: '#fff', border: '1px solid #DC2626' } }} />
 
       {/* --- SIDEBAR --- */}
-      <aside className="w-64 bg-black border-r border-white/5 p-6 flex flex-col hidden md:flex">
-        <div className="text-red-600 font-bold tracking-widest text-xl mb-12 flex items-center gap-2">
+      <aside className="w-full md:w-64 bg-black border-b md:border-r border-white/5 p-6 flex flex-col shrink-0">
+        <div className="text-red-600 font-bold tracking-widest text-xl mb-6 md:mb-12 flex items-center gap-2">
             <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse"/> ADMIN_PANEL
         </div>
-        <nav className="flex-grow space-y-2">
+        <nav className="flex md:flex-col gap-2 overflow-x-auto md:overflow-visible">
             {['profile', 'project', 'certificate'].map(tab => (
                 <button 
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`w-full text-left p-3 rounded text-xs font-mono uppercase tracking-wider transition-all ${activeTab === tab ? 'bg-red-600 text-black font-bold' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                    className={`whitespace-nowrap w-full text-left p-3 rounded text-xs font-mono uppercase tracking-wider transition-all ${activeTab === tab ? 'bg-red-600 text-black font-bold' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
                 >
                     &gt; {tab}
                 </button>
             ))}
         </nav>
-        <button onClick={() => { localStorage.removeItem('token'); navigate('/'); }} className="flex items-center gap-2 text-gray-500 hover:text-white text-xs font-mono uppercase mt-auto">
+        <button onClick={() => { localStorage.removeItem('token'); navigate('/'); }} className="flex items-center gap-2 text-gray-500 hover:text-white text-xs font-mono uppercase mt-4 md:mt-auto">
             <LogOut size={14}/> TERMINATE_SESSION
         </button>
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-grow p-12 overflow-y-auto">
+      <main className="flex-grow p-6 md:p-12 overflow-y-auto h-[calc(100vh-80px)] md:h-screen">
         
         {/* PROFILE TAB */}
         {activeTab === 'profile' && (
@@ -225,8 +231,10 @@ const AdminDashboard = () => {
                     <InputField label="Tech Stack (Comma Separated)" value={projectData.techStack} onChange={e => setProjectData({...projectData, techStack: e.target.value})} placeholder="e.g. Python, React, Kali Linux" />
                     
                     {/* LINKS SECTION */}
-                    <InputField label="Live Demo URL" value={projectData.liveLink} onChange={e => setProjectData({...projectData, liveLink: e.target.value})} placeholder="https://your-demo-site.com" />
-                    <InputField label="Repository URL (GitHub)" value={projectData.repoLink} onChange={e => setProjectData({...projectData, repoLink: e.target.value})} placeholder="https://github.com/yourusername/repo" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <InputField label="Live Demo URL" value={projectData.liveLink} onChange={e => setProjectData({...projectData, liveLink: e.target.value})} placeholder="https://your-demo-site.com" />
+                        <InputField label="Repository URL (GitHub)" value={projectData.repoLink} onChange={e => setProjectData({...projectData, repoLink: e.target.value})} placeholder="https://github.com/yourusername/repo" />
+                    </div>
                     
                     <button onClick={saveProject} disabled={isSaving} className="mt-4 w-full bg-red-600 text-black font-bold py-3 rounded hover:bg-red-500 transition-all uppercase tracking-widest font-mono flex justify-center">
                         {isSaving ? <Loader className="animate-spin"/> : "SAVE PROJECT"}
