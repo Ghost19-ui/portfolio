@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken'); // 👈 ADDED THIS IMPORT
+const jwt = require('jsonwebtoken');
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -20,21 +20,24 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add a password'],
     minlength: 6,
-    select: false 
+    select: false
   },
+  // Security Role (Admin/User) - DO NOT CHANGE MANUALLY
   role: {
     type: String,
     enum: ['user', 'admin'],
     default: 'user'
   },
-  // Portfolio Specific Fields
-  title: String,
+  
+  // --- Portfolio Fields ---
+  title: String,      // 👈 This is where "Red Team Operator" goes
   bio: String,
+  phone: String,
   github: String,
   linkedin: String,
   instagram: String,
-  phone: String,
   resumeUrl: String,
+  
   createdAt: {
     type: Date,
     default: Date.now
@@ -50,17 +53,17 @@ UserSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Match user entered password to hashed password in database
-UserSchema.methods.comparePassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
-};
-
-// --- 🛑 THIS WAS MISSING 🛑 ---
 // Sign JWT and return
 UserSchema.methods.getSignedJwtToken = function() {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE || '30d'
+    expiresIn: process.env.JWT_EXPIRE
   });
 };
 
-module.exports = mongoose.model('User', UserSchema);
+// Match user entered password to hashed password in database
+UserSchema.methods.matchPassword = async function(enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Handle case sensitivity for Linux servers
+module.exports = mongoose.models.User || mongoose.model('User', UserSchema);
