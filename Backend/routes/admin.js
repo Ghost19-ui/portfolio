@@ -17,14 +17,14 @@ router.get('/profile', protect, async (req, res) => {
     }
 });
 
-// Update Profile (SANITIZED FIX)
+// Update Profile (FIXED: Sanitized Inputs)
 router.put('/profile', protect, async (req, res) => {
     try {
-        // 1. Explicitly extract ONLY the fields we allow the user to change.
-        // We DO NOT extract 'role' here, so it cannot be overwritten.
+        // 1. Manually extract allowed fields. 
+        // We DO NOT extract 'role', so it cannot be overwritten by mistake.
         const { 
             name, 
-            title, 
+            title, // 👈 This is for "Red Team Operator"
             bio, 
             email, 
             phone, 
@@ -34,7 +34,7 @@ router.put('/profile', protect, async (req, res) => {
             resumeUrl 
         } = req.body;
 
-        // 2. Create a clean update object
+        // 2. Create the update object
         const updates = { 
             name, 
             title, 
@@ -47,7 +47,7 @@ router.put('/profile', protect, async (req, res) => {
             resumeUrl 
         };
 
-        // 3. Update the user
+        // 3. Update the user with only the allowed fields
         const user = await User.findByIdAndUpdate(
             req.user.id, 
             updates, 
@@ -57,7 +57,7 @@ router.put('/profile', protect, async (req, res) => {
         res.json(user);
 
     } catch (err) {
-        console.error(err); // Log the error to Vercel console
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
