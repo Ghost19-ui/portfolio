@@ -52,7 +52,10 @@ const Navbar = () => {
             {activeTab === item.id && (
               <motion.div layoutId="active-pill" className="absolute inset-0 bg-cyber-red rounded-full mix-blend-difference" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
             )}
-            <span className={activeTab === item.id ? "text-cyber-red" : "text-gray-400 hover:text-white"}>{item.label}</span>
+            {/* INJECTED CYBER-LINK HERE */}
+            <span className={`cyber-link relative z-10 ${activeTab === item.id ? "text-cyber-red" : "text-gray-400"}`}>
+                {item.label}
+            </span>
           </button>
         ))}
       </div>
@@ -61,11 +64,13 @@ const Navbar = () => {
       {/* Admin Button */}
       <div className="bg-cyber-dark/90 backdrop-blur-md border border-white/10 rounded-full p-2 flex gap-2 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
           {user ? (
-            <button onClick={logout} className="p-2 text-cyber-red hover:bg-white/10 rounded-full transition-all" title="Logout">
+            // INJECTED CYBER-LINK HERE
+            <button onClick={logout} className="cyber-link p-2 text-cyber-red rounded-full" title="Logout">
                 <LogOut size={18} />
             </button>
           ) : (
-            <Link to="/login" className="p-2 text-gray-400 hover:text-cyber-red hover:bg-white/10 rounded-full transition-all" title="Admin Login">
+            // INJECTED CYBER-LINK HERE
+            <Link to="/login" className="cyber-link p-2 text-gray-400 rounded-full" title="Admin Login">
                 <Lock size={18} />
             </Link>
           )}

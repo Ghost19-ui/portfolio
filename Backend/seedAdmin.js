@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); // Needed if you manually hash, but usually handled in Model
 require('dotenv').config();
 
-const User = require('./models/User');
+const User = require('./models/UserModel');
 
 const createAdminUser = async () => {
   try {
