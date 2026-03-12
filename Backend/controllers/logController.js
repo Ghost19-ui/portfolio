@@ -6,9 +6,9 @@ exports.createLog = async (req, res) => {
         const { event, details, level } = req.body;
         const newLog = new Log({
             event,
-            details,
+            message: details, 
             level,
-            ip: req.ip // Automatically capture requester IP
+            ip: req.ip 
         });
         await newLog.save();
         res.status(201).json({ success: true });
@@ -16,7 +16,6 @@ exports.createLog = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
 // Fetch recent logs for the Live Terminal
 exports.getLogs = async (req, res) => {
     try {
