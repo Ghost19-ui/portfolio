@@ -26,7 +26,7 @@ router.put('/profile', protect, async (req, res) => {
             name, 
             title, // 👈 This is for "Red Team Operator"
             bio, 
-            email, 
+             
             phone, 
             github, 
             linkedin, 
@@ -39,7 +39,7 @@ router.put('/profile', protect, async (req, res) => {
             name, 
             title, 
             bio, 
-            email, 
+             
             phone, 
             github, 
             linkedin, 
