@@ -14,7 +14,7 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await API.get('/data/all-public-data');
+        const res = await API.get('/all-public-data');
         setData(res.data);
       } catch (err) {
         console.error("Failed to load public data", err);
